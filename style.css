@@ -1,0 +1,92 @@
+/* ==========================================================================
+   BAR HANDYCAPP - STILE GENERALE (MOBILE-FIRST)
+   ========================================================================== */
+body {
+    background-color: #0d0d0d;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* --- BARRA DI NAVIGAZIONE CATEGORIE (STICKY) --- */
+.sticky-nav {
+    position: sticky;
+    top: 0;
+    background-color: #1a1a1a;
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 15px 10px;
+    border-bottom: 2px solid #ffc107;
+    z-index: 1000;
+    scrollbar-width: none; /* Nasconde barra per Firefox */
+}
+.sticky-nav::-webkit-scrollbar {
+    display: none; /* Nasconde barra per Chrome e Safari */
+}
+.sticky-nav a {
+    color: #aaa;
+    text-decoration: none;
+    padding: 5px 15px;
+    font-weight: 600;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.sticky-nav a:hover {
+    color: #ffc107;
+}
+
+/* --- CONTENITORI DEL MENU --- */
+.menu-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+.menu-category {
+    margin-bottom: 50px;
+    scroll-margin-top: 80px; /* Impedisce alla barra fissa di coprire il titolo */
+}
+.menu-category h2 {
+    font-size: 28px;
+    color: #ffc107;
+    text-transform: uppercase;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    letter-spacing: 2px;
+}
+.menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* --- IL SINGOLO PIATTO / DRINK --- */
+.menu-item {
+    border-bottom: 1px dashed #222;
+    padding-bottom: 15px;
+}
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.item-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+}
+.item-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffc107;
+    white-space: nowrap;
+}
+.item-description {
+    font-size: 14px;
+    color: #888;
+    margin: 5px 0 0 0;
+    line-height: 1.4;
+}
