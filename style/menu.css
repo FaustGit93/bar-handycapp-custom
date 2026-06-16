@@ -1,0 +1,18 @@
+/* BASE MOBILE-FIRST CSS */
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #111; color: #fff; }
+
+/* 1. BARRA DI NAVIGAZIONE STICKY */
+.sticky-nav { position: sticky; top: 0; background-color: #222; display: flex; overflow-x: auto; white-space: nowrap; padding: 10px; border-bottom: 1px solid #333; z-index: 1000; }
+.sticky-nav a { color: #ccc; text-decoration: none; padding: 8px 16px; font-weight: bold; font-size: 14px; display: inline-block; }
+.sticky-nav a:hover { color: #fff; }
+
+/* 2. STRUTTURA DEL LAYOUT DEI PIATTI */
+.menu-container { padding: 20px; max-width: 600px; margin: 0 auto; }
+.category-section { margin-bottom: 40px; scroll-margin-top: 60px; }
+.category-title { font-size: 24px; color: #ffc107; border-bottom: 2px solid #ffc107; padding-bottom: 5px; margin-bottom: 20px; }
+
+/* 3. IL SINGOLO PIATTO */
+.menu-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #333; }
+.item-main { display: flex; justify-content: space-between; align-items: baseline; font-size: 18px; font-weight: bold; }
+.item-price { color: #ffc107; margin-left: 10px; }
+.item-description { font-size: 14px; color: #aaa; margin: 5px 0 0 0; font-weight: normal; }
