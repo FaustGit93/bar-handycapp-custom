@@ -1,4 +1,17 @@
 <?php
+
+
+// Avviamo la sessione per controllare se l'utente è autorizzato
+session_start();
+
+// Se la variabile di sessione NON esiste, significa che l'utente non ha fatto il login
+if (!isset($_SESSION['admin_loggato']) || $_SESSION['admin_loggato'] !== true) {
+    // Lo cacciamo indietro alla pagina di login
+    header("Location: login.php");
+    exit();
+}
+
+// ... da qui in poi continua il tuo vecchio codice di admin.php ...
 include 'connessione.php';
 
 $messaggio = "";
@@ -168,6 +181,9 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
         </tbody>
     </table>
 </div>
+
+<a href="logout.php" style="color: #dc3545; float: right; font-weight: bold; text-decoration: none;"> Esci (Logout)</a>
+
 
 </body>
 </html>
