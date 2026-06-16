@@ -1,0 +1,21 @@
+# --- DATABASE & CREDENZIALI (CRITICO!) ---
+# Escludiamo il file di configurazione reale con le password del server
+config.php
+connessione.php
+
+# --- FILE DI SISTEMA & IDE ---
+# File generati dal sistema operativo (es. Mac o Windows)
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# File delle estensioni o degli editor di codice (es. VS Code)
+.vscode/
+.idea/
+*.log
+
+# --- CARICAMENTI (UPLOAD) ---
+# Se in futuro permetterai al barista di caricare le foto dei piatti, 
+# escludiamo i file caricati per non riempire la repo di foto inutili
+assets/uploads/*
+!assets/uploads/.gitkeep
