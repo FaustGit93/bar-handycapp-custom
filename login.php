@@ -13,7 +13,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: admin.php");
         exit();
     } else {
-        $errore = "👅 Password errata. Riprova.";
+        $errore = "❌ Password errata. Riprova.";
     }
 }
 ?>
