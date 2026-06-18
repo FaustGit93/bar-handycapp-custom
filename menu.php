@@ -2,8 +2,11 @@
 
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
-header("Expires: 0");
+header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 include 'connessione.php';
+
+
 
 $categorie_query = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
 ?>
@@ -11,6 +14,9 @@ $categorie_query = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
 <!DOCTYPE html>
 <html lang="it">
 <head>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu - Bar HandyCapp</title>
