@@ -19,3 +19,5 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           server-dir: /www.bartest.it/
+          state-name: .ftp-deploy-sync-state.json
+          dangerous-clean-slate: false
