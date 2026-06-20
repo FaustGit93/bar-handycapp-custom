@@ -50,6 +50,21 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'elimina_cat' && isset($_GET['i
     }
 }
 
+
+// --- LOGICA CATEGORIE: MOSTRA/NASCONDI ---
+if (isset($_GET['azione']) && $_GET['azione'] == 'switch_visibilita_cat' && isset($_GET['id'])) {
+    $id_cat = intval($_GET['id']);
+    $nuovo_stato = intval($_GET['stato']);
+    $stmt = $conn->prepare("UPDATE categorie SET visibile = ? WHERE id = ?");
+    $stmt->bind_param("ii", $nuovo_stato, $id_cat);
+    $stmt->execute();
+    $stmt->close();
+    header("Location: admin.php");
+    exit();
+}
+
+
+
 // --- LOGICA CATEGORIE: SPOSTA SU / GIÙ ---
 if (isset($_GET['azione']) && in_array($_GET['azione'], ['cat_su', 'cat_giu']) && isset($_GET['id'])) {
     $id_corrente = intval($_GET['id']);
