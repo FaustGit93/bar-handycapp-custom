@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($password_inserita === ADMIN_PASSWORD) {
         $_SESSION['admin_loggato'] = true;
-        header("Location: admin2.php");
+        header("Location: admin.php");
         exit();
     } else {
         $errore = "❌ Password errata. Riprova.";
