@@ -58,3 +58,25 @@ th { background-color: #f8f9fa; }
 .form-modifica.aperto { max-height: 500px; margin-top: 14px; }
 .form-modifica form { border-top: 1px solid #eee; padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
 .form-modifica button { width: auto; padding: 8px 20px; align-self: flex-start; }
+
+
+/* ── Griglia allergeni ── */
+.allergeni-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin-top: 5px;
+}
+.allergene-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    font-size: 13px;
+    background: #f8f9fa;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+    cursor: pointer;
+}
+.allergene-checkbox input { width: auto; }

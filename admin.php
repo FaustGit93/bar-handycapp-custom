@@ -154,12 +154,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !iss
     $categoria_id = intval($_POST['categoria_id']);
     $nome = trim($_POST['nome']);
     $descrizione = trim($_POST['descrizione']);
+    $note_allergeni = trim($_POST['note_allergeni']);
     $prezzo = floatval($_POST['prezzo']);
     $disponibile = isset($_POST['disponibile']) ? 1 : 0;
 
-    $stmt = $conn->prepare("INSERT INTO piatti (categoria_id, nome, descrizione, prezzo, disponibile) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("issdi", $categoria_id, $nome, $descrizione, $prezzo, $disponibile);
+    $stmt = $conn->prepare("INSERT INTO piatti (categoria_id, nome, descrizione, note_allergeni, prezzo, disponibile) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssi", $categoria_id, $nome, $descrizione, $note_allergeni, $prezzo, $disponibile);
     if ($stmt->execute()) {
+        $nuovo_id_piatto = $stmt->insert_id;
+
+        // Salviamo gli allergeni selezionati (se presenti)
+        if (isset($_POST['allergeni']) && is_array($_POST['allergeni'])) {
+            $stmt_all = $conn->prepare("INSERT INTO piatti_allergeni (piatto_id, allergene_id) VALUES (?, ?)");
+            foreach ($_POST['allergeni'] as $id_allergene) {
+                $id_allergene = intval($id_allergene);
+                $stmt_all->bind_param("ii", $nuovo_id_piatto, $id_allergene);
+                $stmt_all->execute();
+            }
+            $stmt_all->close();
+        }
+
         $messaggio = "<div class='alert success'>✅ Piatto inserito con successo!</div>";
     } else {
         $messaggio = "<div class='alert error'>❌ Errore durante l'inserimento.</div>";
@@ -176,6 +190,11 @@ while ($c = $cat_lista->fetch_assoc()) {
 $totale_cat = count($tutte_categorie);
 
 $categorie_per_form = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
+$lista_allergeni = $conn->query("SELECT * FROM allergeni ORDER BY id ASC");
+$tutti_allergeni = [];
+while ($a = $lista_allergeni->fetch_assoc()) {
+    $tutti_allergeni[] = $a;
+}
 $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p JOIN categorie c ON p.categoria_id = c.id ORDER BY c.ordine ASC, p.nome ASC");
 ?>
 
@@ -275,10 +294,29 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
             <label for="nome">Nome del Prodotto</label>
             <input type="text" name="nome" id="nome" required placeholder="Es. Spritz Aperol">
         </div>
-        <div class="form-group">
-            <label for="descrizione">Descrizione / Ingredienti</label>
-            <textarea name="descrizione" id="descrizione" rows="2"></textarea>
-        </div>
+      <div class="form-group">
+    <label for="descrizione">Descrizione / Ingredienti</label>
+    <textarea name="descrizione" id="descrizione" rows="2"></textarea>
+</div>
+<div class="form-group">
+    <label>Allergeni</label>
+    <div class="allergeni-grid">
+        <?php foreach ($tutti_allergeni as $allergene): ?>
+            <label class="allergene-checkbox">
+                <input type="checkbox" name="allergeni[]" value="<?php echo $allergene['id']; ?>">
+                <?php echo htmlspecialchars($allergene['nome']); ?>
+            </label>
+        <?php endforeach; ?>
+    </div>
+</div>
+<div class="form-group">
+    <label for="note_allergeni">Note allergeni (facoltativo)</label>
+    <input type="text" name="note_allergeni" id="note_allergeni" placeholder="Es. tracce di frutta a guscio">
+</div>
+<div class="form-group">
+    <label for="prezzo">Prezzo (€)</label>
+    <input type="number" name="prezzo" id="prezzo" step="0.01" required>
+</div>
         <div class="form-group">
             <label for="prezzo">Prezzo (€)</label>
             <input type="number" name="prezzo" id="prezzo" step="0.01" required>
