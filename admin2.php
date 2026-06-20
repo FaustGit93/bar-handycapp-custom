@@ -90,7 +90,7 @@ if (isset($_GET['azione']) && in_array($_GET['azione'], ['cat_su', 'cat_giu']) &
         $stmt2->close();
     }
 
-    header("Location: admin.php");
+    header("Location: admin2.php");
     exit();
 }
 
@@ -115,7 +115,7 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'switch_Stato' && isset($_GET['
     $stmt->bind_param("ii", $nuovo_stato, $id_piatto);
     $stmt->execute();
     $stmt->close();
-    header("Location: admin.php");
+    header("Location: admin2.php");
     exit();
 }
 
