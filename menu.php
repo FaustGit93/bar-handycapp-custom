@@ -34,8 +34,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         $categorie_query->data_seek(0);
         ?>
     </nav>
-
-    <div class="menu-container">
+<div class="menu-container">
         <?php
         while ($cat = $categorie_query->fetch_assoc()) {
             $categoria_id = $cat['id'];
@@ -46,14 +45,43 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
                 echo "<h2 class='category-title'>" . htmlspecialchars($cat['nome']) . "</h2>";
 
                 while ($piatto = $piatti_query->fetch_assoc()) {
+                    // Recuperiamo gli allergeni di questo piatto
+                    $id_piatto_corrente = $piatto['id'];
+                    $allergeni_piatto_query = $conn->query("
+                        SELECT a.nome FROM allergeni a
+                        JOIN piatti_allergeni pa ON a.id = pa.allergene_id
+                        WHERE pa.piatto_id = $id_piatto_corrente
+                    ");
+                    $nomi_allergeni = [];
+                    while ($al = $allergeni_piatto_query->fetch_assoc()) {
+                        $nomi_allergeni[] = $al['nome'];
+                    }
+                    $ha_note = !empty($piatto['note_allergeni']);
+                    $ha_allergeni = count($nomi_allergeni) > 0 || $ha_note;
+
                     echo "<div class='menu-item'>";
                     echo "  <div class='item-main'>";
-                    echo "    <span class='item-name'>" . htmlspecialchars($piatto['nome']) . "</span>";
+                    echo "    <span class='item-name'>" . htmlspecialchars($piatto['nome']);
+                    if ($ha_allergeni) {
+                        echo " <a href='#' class='icona-allergeni' onclick=\"document.getElementById('allergeni-$id_piatto_corrente').classList.toggle('aperto'); return false;\">⚠️</a>";
+                    }
+                    echo "</span>";
                     echo "    <span class='item-price'>€" . number_format($piatto['prezzo'], 2, ',', '.') . "</span>";
                     echo "  </div>";
 
                     if (!empty($piatto['descrizione'])) {
                         echo "  <p class='item-description'>" . htmlspecialchars($piatto['descrizione']) . "</p>";
+                    }
+
+                    if ($ha_allergeni) {
+                        echo "  <div class='dettaglio-allergeni' id='allergeni-$id_piatto_corrente'>";
+                        if (count($nomi_allergeni) > 0) {
+                            echo "    <strong>Allergeni:</strong> " . htmlspecialchars(implode(', ', $nomi_allergeni));
+                        }
+                        if ($ha_note) {
+                            echo "    <p>" . htmlspecialchars($piatto['note_allergeni']) . "</p>";
+                        }
+                        echo "  </div>";
                     }
 
                     echo "</div>";
@@ -64,6 +92,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         }
         ?>
     </div>
+  
 
 </body>
 </html>
