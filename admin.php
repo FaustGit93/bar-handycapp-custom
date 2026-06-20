@@ -317,10 +317,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <label for="prezzo">Prezzo (€)</label>
     <input type="number" name="prezzo" id="prezzo" step="0.01" required>
 </div>
-        <div class="form-group">
-            <label for="prezzo">Prezzo (€)</label>
-            <input type="number" name="prezzo" id="prezzo" step="0.01" required>
-        </div>
+        
         <div class="form-group" style="display:flex; align-items:center; gap:10px;">
             <input type="checkbox" name="disponibile" id="disponibile" value="1" checked>
             <label for="disponibile" style="margin:0;">Disponibile subito sul sito</label>
