@@ -353,7 +353,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 
     <hr>
 
-   <!-- ===== LISTA PIATTI A CARD ===== -->
+ <!-- ===== LISTA PIATTI A CARD ===== -->
 <h2>📋 Piatti in Menu</h2>
 
 <?php if ($piatti_query->num_rows > 0):
@@ -473,8 +473,6 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 <?php else: ?>
     <p style="color:#888; text-align:center; margin-top:20px;">Nessun piatto presente nel database.</p>
 <?php endif; ?>
-    <?php else: ?>
-
 
 </div>
 
