@@ -353,126 +353,108 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 
     <hr>
 
- <!-- ===== LISTA PIATTI A CARD ===== -->
-<h2>📋 Piatti in Menu</h2>
+    <!-- ===== LISTA PIATTI A CARD ===== -->
+    <h2>📋 Piatti in Menu</h2>
 
-<?php if ($piatti_query->num_rows > 0):
-    $categoria_corrente = null;
-    $categorie_per_edit = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
-    $lista_categorie_edit = [];
-    while ($c = $categorie_per_edit->fetch_assoc()) {
-        $lista_categorie_edit[] = $c;
-    }
-?>
-<div class="piatti-lista">
-    <?php while ($piatto = $piatti_query->fetch_assoc()):
-        // Recuperiamo gli allergeni già assegnati a questo piatto
-        $id_piatto_loop = $piatto['id'];
-        $res_allergeni_piatto = $conn->query("SELECT allergene_id FROM piatti_allergeni WHERE piatto_id = $id_piatto_loop");
-        $allergeni_selezionati = [];
-        while ($ra = $res_allergeni_piatto->fetch_assoc()) {
-            $allergeni_selezionati[] = $ra['allergene_id'];
+    <?php if ($piatti_query->num_rows > 0):
+        $categoria_corrente = null;
+        $categorie_per_edit = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
+        $lista_categorie_edit = [];
+        while ($c = $categorie_per_edit->fetch_assoc()) {
+            $lista_categorie_edit[] = $c;
         }
     ?>
+    <div class="piatti-lista">
+     <?php while ($piatto = $piatti_query->fetch_assoc()):
+    // Recuperiamo gli allergeni già assegnati a questo piatto
+    $id_piatto_loop = $piatto['id'];
+    $res_allergeni_piatto = $conn->query("SELECT allergene_id FROM piatti_allergeni WHERE piatto_id = $id_piatto_loop");
+    $allergeni_selezionati = [];
+    while ($ra = $res_allergeni_piatto->fetch_assoc()) {
+        $allergeni_selezionati[] = $ra['allergene_id'];
+    }
+?>
 
-        <?php if ($piatto['nome_categoria'] !== $categoria_corrente): ?>
-            <div class="categoria-header"><?php echo htmlspecialchars($piatto['nome_categoria']); ?></div>
-            <?php $categoria_corrente = $piatto['nome_categoria']; ?>
-        <?php endif; ?>
+    <?php if ($piatto['nome_categoria'] !== $categoria_corrente): ?>
+        <div class="categoria-header"><?php echo htmlspecialchars($piatto['nome_categoria']); ?></div>
+        <?php $categoria_corrente = $piatto['nome_categoria']; ?>
+    <?php endif; ?>
 
-        <div class="piatto-card">
-            <div class="piatto-row">
-                <div class="piatto-info">
-                    <div class="nome"><?php echo htmlspecialchars($piatto['nome']); ?></div>
-                    <?php if (!empty($piatto['descrizione'])): ?>
-                        <div class="descrizione"><?php echo htmlspecialchars($piatto['descrizione']); ?></div>
-                    <?php endif; ?>
-                    <div class="prezzo">€<?php echo number_format($piatto['prezzo'], 2, ',', '.'); ?></div>
+            <div class="piatto-card">
+                <div class="piatto-row">
+                    <div class="piatto-info">
+                        <div class="nome"><?php echo htmlspecialchars($piatto['nome']); ?></div>
+                        <?php if (!empty($piatto['descrizione'])): ?>
+                            <div class="descrizione"><?php echo htmlspecialchars($piatto['descrizione']); ?></div>
+                        <?php endif; ?>
+                        <div class="prezzo">€<?php echo number_format($piatto['prezzo'], 2, ',', '.'); ?></div>
+                    </div>
+                    <div class="piatto-azioni">
+                        <?php if ($piatto['disponibile'] == 1): ?>
+                            <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
+                               class="badge badge-attivo" title="Disponibile — clicca per segnare come esaurito">✅</a>
+                        <?php else: ?>
+                            <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
+                               class="badge badge-disattivato" title="Esaurito — clicca per rendere disponibile">🚫</a>
+                        <?php endif; ?>
+
+                        <a href="#" class="btn-modifica-icon" title="Modifica piatto"
+                           onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
+
+                        <a href="admin.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
+                           class="btn-elimina-icon"
+                           title="Elimina piatto"
+                           onclick="return confirm('Eliminare definitivamente <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
+                    </div>
                 </div>
-                <div class="piatto-azioni">
-                    <?php if ($piatto['disponibile'] == 1): ?>
-                        <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
-                           class="badge badge-attivo" title="Disponibile — clicca per segnare come esaurito">✅</a>
-                    <?php else: ?>
-                        <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
-                           class="badge badge-disattivato" title="Esaurito — clicca per rendere disponibile">🚫</a>
-                    <?php endif; ?>
 
-                    <a href="#" class="btn-modifica-icon" title="Modifica piatto"
-                       onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
+                <!-- Form di modifica inline, nascosto finché non si clicca la matita -->
+                <div class="form-modifica" id="edit-<?php echo $piatto['id']; ?>">
+                    <form action="admin.php" method="POST">
+                        <input type="hidden" name="azione_piatto" value="modifica">
+                        <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
 
-                    <a href="admin.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
-                       class="btn-elimina-icon"
-                       title="Elimina piatto"
-                       onclick="return confirm('Eliminare definitivamente <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
-                </div>
-            </div>
-
-            <!-- Form di modifica inline, nascosto finché non si clicca la matita -->
-            <div class="form-modifica" id="edit-<?php echo $piatto['id']; ?>">
-                <form action="admin.php" method="POST">
-                    <input type="hidden" name="azione_piatto" value="modifica">
-                    <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
-
-                    <div class="form-group">
-                        <label>Categoria</label>
-                        <select name="categoria_id" required>
-                            <?php foreach ($lista_categorie_edit as $cat_opt): ?>
-                                <option value="<?php echo $cat_opt['id']; ?>" <?php echo ($cat_opt['id'] == $piatto['categoria_id']) ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($cat_opt['nome']); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Nome</label>
-                        <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Descrizione</label>
-                        <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Allergeni</label>
-                        <div class="allergeni-grid">
-                            <?php foreach ($tutti_allergeni as $allergene): ?>
-                                <label class="allergene-checkbox">
-                                    <input type="checkbox" name="allergeni[]" value="<?php echo $allergene['id']; ?>"
-                                        <?php echo in_array($allergene['id'], $allergeni_selezionati) ? 'checked' : ''; ?>>
-                                    <?php echo htmlspecialchars($allergene['nome']); ?>
-                                </label>
-                            <?php endforeach; ?>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select name="categoria_id" required>
+                                <?php foreach ($lista_categorie_edit as $cat_opt): ?>
+                                    <option value="<?php echo $cat_opt['id']; ?>" <?php echo ($cat_opt['id'] == $piatto['categoria_id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($cat_opt['nome']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Note allergeni (facoltativo)</label>
-                        <input type="text" name="note_allergeni" value="<?php echo htmlspecialchars($piatto['note_allergeni'] ?? ''); ?>">
-                    </div>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
+                        </div>
 
-                    <div class="form-group">
-                        <label>Prezzo (€)</label>
-                        <input type="number" name="prezzo" step="0.01" required value="<?php echo $piatto['prezzo']; ?>">
-                    </div>
+                        <div class="form-group">
+                            <label>Descrizione</label>
+                            <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
+                        </div>
 
-                    <div class="form-group" style="display:flex; align-items:center; gap:10px;">
-                        <input type="checkbox" name="disponibile" value="1" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
-                        <label style="margin:0;">Disponibile</label>
-                    </div>
+                        <div class="form-group">
+                            <label>Prezzo (€)</label>
+                            <input type="number" name="prezzo" step="0.01" required value="<?php echo $piatto['prezzo']; ?>">
+                        </div>
 
-                    <button type="submit">Salva modifiche</button>
-                </form>
+                        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" name="disponibile" value="1" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
+                            <label style="margin:0;">Disponibile</label>
+                        </div>
+
+                        <button type="submit">Salva modifiche</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-    <?php endwhile; ?>
-</div>
-<?php else: ?>
-    <p style="color:#888; text-align:center; margin-top:20px;">Nessun piatto presente nel database.</p>
-<?php endif; ?>
+        <?php endwhile; ?>
+    </div>
+    <?php else: ?>
+        <p style="color:#888; text-align:center; margin-top:20px;">Nessun piatto presente nel database.</p>
+    <?php endif; ?>
 
 </div>
 
