@@ -60,6 +60,18 @@ th { background-color: #f8f9fa; }
 .form-modifica button { width: auto; padding: 8px 20px; align-self: flex-start; }
 
 
+
+.blocco-allergeni-toggle {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .25s ease, margin-top .25s ease;
+    margin-top: 0;
+}
+.blocco-allergeni-toggle.aperto {
+    max-height: 600px;
+    margin-top: 10px;
+}
+
 /* ── Griglia allergeni ── */
 .allergeni-grid {
     display: grid;
