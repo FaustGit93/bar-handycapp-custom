@@ -29,17 +29,30 @@ th { background-color: #f8f9fa; }
 
 /* ── Card piatti ── */
 .piatti-lista { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-.piatto-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
+.piatto-card { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 14px; border: 1px solid #ddd; border-radius: 6px; background: #fff; }
+.piatto-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .piatto-info { flex: 1; min-width: 0; }
 .piatto-info .nome { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.piatto-info .meta { font-size: 12px; color: #888; margin-top: 2px; }
-.piatto-info .prezzo { font-size: 13px; font-weight: 600; color: #333; margin-top: 2px; }
+.piatto-info .descrizione { font-size: 13px; color: #777; margin-top: 3px; line-height: 1.4; }
+.piatto-info .prezzo { font-size: 13px; font-weight: 600; color: #333; margin-top: 4px; }
 .piatto-azioni { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
 .badge { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; text-decoration: none; font-size: 18px; border: 1px solid transparent; transition: opacity .15s; }
 .badge:hover { opacity: 0.75; }
 .badge-attivo { background-color: #d4edda; border-color: #b1dfbb; }
 .badge-disattivato { background-color: #e2e3e5; border-color: #c6c8ca; }
+
+.btn-modifica-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background-color: #fff8e1; border: 1px solid #ffe082; color: #f57f17; text-decoration: none; font-size: 18px; transition: background-color .15s; }
+.btn-modifica-icon:hover { background-color: #ffecb3; }
+
 .btn-elimina-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background-color: #fff0f0; border: 1px solid #f5c6cb; color: #dc3545; text-decoration: none; font-size: 18px; transition: background-color .15s; }
 .btn-elimina-icon:hover { background-color: #f8d7da; }
+
 .categoria-header { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #888; margin: 18px 0 6px; }
 .categoria-header:first-child { margin-top: 0; }
+
+/* ── Form modifica inline ── */
+.form-modifica { max-height: 0; overflow: hidden; transition: max-height .25s ease, margin-top .25s ease; margin-top: 0; }
+.form-modifica.aperto { max-height: 500px; margin-top: 14px; }
+.form-modifica form { border-top: 1px solid #eee; padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+.form-modifica button { width: auto; padding: 8px 20px; align-self: flex-start; }
