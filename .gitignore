@@ -2,6 +2,7 @@
 # Escludiamo il file di configurazione reale con le password del server
 config.php
 connessione.php
+config_loc.php
 
 # --- FILE DI SISTEMA & IDE ---
 # File generati dal sistema operativo (es. Mac o Windows)

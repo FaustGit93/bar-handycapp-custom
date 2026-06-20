@@ -17,7 +17,6 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 .item-price { color: #ffc107; margin-left: 10px; }
 .item-description { font-size: 14px; color: #aaa; margin: 5px 0 0 0; font-weight: normal; }
 
-/* ── Allergeni ── */
 .icona-allergeni {
     text-decoration: none;
     font-size: 14px;
@@ -26,19 +25,28 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 .dettaglio-allergeni {
-    max-height: 0;
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .25s ease;
     overflow: hidden;
-    transition: max-height .25s ease, margin-top .25s ease;
-    margin-top: 0;
     font-size: 13px;
     color: #ccc;
     background: #1a1a1a;
     border-radius: 4px;
 }
 
+.dettaglio-allergeni-inner {
+    overflow: hidden;
+    min-height: 0;
+    padding: 0 10px;
+}
+
 .dettaglio-allergeni.aperto {
-    max-height: 200px;
+    grid-template-rows: 1fr;
     margin-top: 8px;
+}
+
+.dettaglio-allergeni.aperto .dettaglio-allergeni-inner {
     padding: 8px 10px;
 }
 

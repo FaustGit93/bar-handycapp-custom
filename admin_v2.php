@@ -58,7 +58,7 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'switch_visibilita_cat' && isse
     $stmt->bind_param("ii", $nuovo_stato, $id_cat);
     $stmt->execute();
     $stmt->close();
-    header("Location: admin.php");
+    header("Location: admin_v2.php");
     exit();
 }
 
@@ -97,7 +97,7 @@ if (isset($_GET['azione']) && in_array($_GET['azione'], ['cat_su', 'cat_giu']) &
         $stmt2->close();
     }
 
-    header("Location: admin.php");
+    header("Location: admin_v2.php");
     exit();
 }
 
@@ -122,7 +122,7 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'switch_Stato' && isset($_GET['
     $stmt->bind_param("ii", $nuovo_stato, $id_piatto);
     $stmt->execute();
     $stmt->close();
-    header("Location: admin.php");
+    header("Location: admin_v2.php");
     exit();
 }
 
@@ -229,7 +229,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <h2>📂 Gestione Categorie</h2>
     <?php echo $messaggio_cat; ?>
 
-    <form action="admin.php" method="POST">
+    <form action="admin_v2.php" method="POST">
         <input type="hidden" name="azione_cat" value="aggiungi">
         <div class="form-inline">
             <div class="form-group">
@@ -257,25 +257,25 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                 <td><strong><?php echo htmlspecialchars($cat['nome']); ?></strong></td>
                 <td style="text-align:center;">
                     <?php if ($i > 0): ?>
-                        <a href="admin.php?azione=cat_su&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="Sposta su">▲</a>
+                        <a href="admin_v2.php?azione=cat_su&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="Sposta su">▲</a>
                     <?php else: ?>
                         <span class="freccia-disabilitata">▲</span>
                     <?php endif; ?>
                     <?php if ($i < $totale_cat - 1): ?>
-                        <a href="admin.php?azione=cat_giu&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="Sposta giù">▼</a>
+                        <a href="admin_v2.php?azione=cat_giu&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="Sposta giù">▼</a>
                     <?php else: ?>
                         <span class="freccia-disabilitata">▼</span>
                     <?php endif; ?>
                 </td>
                 <td style="text-align:center;">
                     <?php if ($cat['visibile'] == 1): ?>
-                        <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=0" title="Visibile — clicca per nascondere" style="text-decoration:none;">👁️</a>
+                        <a href="admin_v2.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=0" title="Visibile — clicca per nascondere" style="text-decoration:none;">👁️</a>
                     <?php else: ?>
-                        <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" title="Nascosta — clicca per mostrare" style="opacity:0.4; text-decoration:none;">🚫</a>
+                        <a href="admin_v2.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" title="Nascosta — clicca per mostrare" style="opacity:0.4; text-decoration:none;">🚫</a>
                     <?php endif; ?>
                 </td>
                 <td>
-                    <a href="admin.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina" onclick="return confirm('Eliminare questa categoria? Assicurati che non contenga piatti.');">Elimina</a>
+                    <a href="admin_v2.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina" onclick="return confirm('Eliminare questa categoria? Assicurati che non contenga piatti.');">Elimina</a>
                 </td>
             </tr>
             <?php endforeach; ?>
@@ -291,7 +291,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <h2>🍽️ Nuovo Piatto / Drink</h2>
     <?php echo $messaggio; ?>
 
-    <form action="admin.php" method="POST">
+    <form action="admin_v2.php" method="POST">
         <div class="form-group">
             <label for="categoria_id">Categoria del Menu</label>
             <select name="categoria_id" id="categoria_id" required>
@@ -381,17 +381,17 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                     </div>
                     <div class="piatto-azioni">
                         <?php if ($piatto['disponibile'] == 1): ?>
-                            <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
+                            <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
                                class="badge badge-attivo" title="Disponibile — clicca per segnare come esaurito">✅</a>
                         <?php else: ?>
-                            <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
+                            <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
                                class="badge badge-disattivato" title="Esaurito — clicca per rendere disponibile">🚫</a>
                         <?php endif; ?>
 
                         <a href="#" class="btn-modifica-icon" title="Modifica piatto"
                            onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
 
-                        <a href="admin.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
+                        <a href="admin_v2.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
                            class="btn-elimina-icon"
                            title="Elimina piatto"
                            onclick="return confirm('Eliminare definitivamente <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
@@ -400,7 +400,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 
                 <!-- Form di modifica inline, nascosto finché non si clicca la matita -->
                 <div class="form-modifica" id="edit-<?php echo $piatto['id']; ?>">
-                    <form action="admin.php" method="POST">
+                    <form action="admin_v2.php" method="POST">
                         <input type="hidden" name="azione_piatto" value="modifica">
                         <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
 

@@ -54,9 +54,22 @@ th { background-color: #f8f9fa; }
 .categoria-header:first-child { margin-top: 0; }
 
 /* ── Form modifica inline ── */
-.form-modifica { max-height: 0; overflow: hidden; transition: max-height .25s ease, margin-top .25s ease; margin-top: 0; }
-.form-modifica.aperto { max-height: 500px; margin-top: 14px; }
-.form-modifica form { border-top: 1px solid #eee; padding-top: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+.form-modifica {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .25s ease, margin-top .25s ease;
+    margin-top: 0;
+    overflow: hidden;
+}
+.form-modifica.aperto {
+    grid-template-rows: 1fr;
+    margin-top: 14px;
+}
+.form-modifica > form {
+    min-height: 0;
+}
+
 .form-modifica button { width: auto; padding: 8px 20px; align-self: flex-start; }
 
 
