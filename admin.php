@@ -298,7 +298,15 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <label for="descrizione">Descrizione / Ingredienti</label>
     <textarea name="descrizione" id="descrizione" rows="2"></textarea>
 </div>
+
+
 <div class="form-group">
+    <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
+        <input type="checkbox" id="toggle-allergeni" onclick="document.getElementById('blocco-allergeni').classList.toggle('aperto');" style="width:auto;">
+        Questo piatto contiene allergeni?
+    </label>
+</div>
+<div class="form-group blocco-allergeni-toggle" id="blocco-allergeni">
     <label>Allergeni</label>
     <div class="allergeni-grid">
         <?php foreach ($tutti_allergeni as $allergene): ?>
@@ -308,11 +316,12 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
             </label>
         <?php endforeach; ?>
     </div>
-</div>
-<div class="form-group">
-    <label for="note_allergeni">Note allergeni (facoltativo)</label>
+    <label for="note_allergeni" style="margin-top:10px;">Note allergeni (facoltativo)</label>
     <input type="text" name="note_allergeni" id="note_allergeni" placeholder="Es. tracce di frutta a guscio">
 </div>
+
+
+
 <div class="form-group">
     <label for="prezzo">Prezzo (€)</label>
     <input type="number" name="prezzo" id="prezzo" step="0.01" required>
