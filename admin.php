@@ -170,7 +170,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pannello Admin - Bar HandyCapp</title>
-    <link rel="stylesheet" href="style/admin.css">
+    <link rel="stylesheet" href="style/admin.css?v=<?php echo filemtime('style/admin.css'); ?>">
 </head>
 <body>
 
