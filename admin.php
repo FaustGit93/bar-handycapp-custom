@@ -425,48 +425,30 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                             </select>
                         </div>
 
-                       <div class="form-group">
-    <label>Nome</label>
-    <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
-</div>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
+                        </div>
 
-<div class="form-group">
-    <label>Descrizione</label>
-    <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
-</div>
+                        <div class="form-group">
+                            <label>Descrizione</label>
+                            <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
+                        </div>
 
-<div class="form-group">
-    <label>Allergeni</label>
-    <div class="allergeni-grid">
-        <?php foreach ($tutti_allergeni as $allergene): ?>
-            <label class="allergene-checkbox">
-                <input type="checkbox" name="allergeni[]" value="<?php echo $allergene['id']; ?>"
-                    <?php echo in_array($allergene['id'], $allergeni_selezionati) ? 'checked' : ''; ?>>
-                <?php echo htmlspecialchars($allergene['nome']); ?>
-            </label>
-        <?php endforeach; ?>
-    </div>
-</div>
+                        <div class="form-group">
+                            <label>Prezzo (€)</label>
+                            <input type="number" name="prezzo" step="0.01" required value="<?php echo $piatto['prezzo']; ?>">
+                        </div>
 
-<div class="form-group">
-    <label>Note allergeni (facoltativo)</label>
-    <input type="text" name="note_allergeni" value="<?php echo htmlspecialchars($piatto['note_allergeni'] ?? ''); ?>">
-</div>
+                        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" name="disponibile" value="1" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
+                            <label style="margin:0;">Disponibile</label>
+                        </div>
 
-<div class="form-group">
-    <label>Prezzo (€)</label>
-    <input type="number" name="prezzo" step="0.01" required value="<?php echo $piatto['prezzo']; ?>">
-</div>
-
-<div class="form-group" style="display:flex; align-items:center; gap:10px;">
-    <input type="checkbox" name="disponibile" value="1" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
-    <label style="margin:0;">Disponibile</label>
-</div>
-
-<button type="submit">Salva modifiche</button>
-</form>
-</div>
-</div>
+                        <button type="submit">Salva modifiche</button>
+                    </form>
+                </div>
+            </div>
 
         <?php endwhile; ?>
     </div>
