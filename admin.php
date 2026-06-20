@@ -474,8 +474,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <p style="color:#888; text-align:center; margin-top:20px;">Nessun piatto presente nel database.</p>
 <?php endif; ?>
     <?php else: ?>
-        <p style="color:#888; text-align:center; margin-top:20px;">Nessun piatto presente nel database.</p>
-    <?php endif; ?>
+
 
 </div>
 
