@@ -238,9 +238,12 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                 </td>
                      <td style="text-align:center;">
                     <?php if ($cat['visibile'] == 1): ?>
-                        <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=0" title="Visibile — clicca per nascondere">👁️</a>
+                        <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=0" class="btn-visibilita" title="Visibile — clicca per nascondere">👁️</a>
+
                     <?php else: ?>
-                        <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" title="Nascosta — clicca per mostrare" style="opacity:0.4;">🚫</a>
+                    <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" class="btn-visibilita" title="Nascosta — clicca per mostrare" style="opacity:0.4;">🚫</a>
+
+
                     <?php endif; ?>
                 </td>
                 <td>
