@@ -20,7 +20,8 @@ $categorie_query = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menu - Bar HandyCapp</title>
-    <link rel="stylesheet" href="style/menu.css">
+    <link rel="stylesheet" href="style/menu.css?v=<?php echo filemtime('style/menu.css'); ?>">
+
 </head>
 <body>
 

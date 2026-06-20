@@ -114,8 +114,28 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'switch_Stato' && isset($_GET['
     exit();
 }
 
+// --- LOGICA PIATTI: MODIFICA ---
+if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
+    $id_piatto = intval($_POST['id_piatto']);
+    $categoria_id = intval($_POST['categoria_id']);
+    $nome = trim($_POST['nome']);
+    $descrizione = trim($_POST['descrizione']);
+    $prezzo = floatval($_POST['prezzo']);
+    $disponibile = isset($_POST['disponibile']) ? 1 : 0;
+
+    $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, nome = ?, descrizione = ?, prezzo = ?, disponibile = ? WHERE id = ?");
+    $stmt->bind_param("issdii", $categoria_id, $nome, $descrizione, $prezzo, $disponibile, $id_piatto);
+
+    if ($stmt->execute()) {
+        $messaggio = "<div class='alert success'>✅ Piatto aggiornato con successo!</div>";
+    } else {
+        $messaggio = "<div class='alert error'>❌ Errore durante l'aggiornamento.</div>";
+    }
+    $stmt->close();
+}
+
 // --- LOGICA PIATTI: INSERIMENTO ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !isset($_POST['azione_piatto'])) {
     $categoria_id = intval($_POST['categoria_id']);
     $nome = trim($_POST['nome']);
     $descrizione = trim($_POST['descrizione']);
@@ -150,7 +170,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pannello Admin - Bar HandyCapp</title>
-    <link rel="stylesheet" href="style/admin.css">
+    <link rel="stylesheet" href="style/admin.css?v=<?php echo filemtime('style/admin.css'); ?>">
 </head>
 <body>
 
@@ -253,6 +273,11 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 
     <?php if ($piatti_query->num_rows > 0):
         $categoria_corrente = null;
+        $categorie_per_edit = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
+        $lista_categorie_edit = [];
+        while ($c = $categorie_per_edit->fetch_assoc()) {
+            $lista_categorie_edit[] = $c;
+        }
     ?>
     <div class="piatti-lista">
         <?php while ($piatto = $piatti_query->fetch_assoc()): ?>
@@ -263,23 +288,72 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
             <?php endif; ?>
 
             <div class="piatto-card">
-                <div class="piatto-info">
-                    <div class="nome"><?php echo htmlspecialchars($piatto['nome']); ?></div>
-                    <div class="prezzo">€<?php echo number_format($piatto['prezzo'], 2, ',', '.'); ?></div>
-                </div>
-                <div class="piatto-azioni">
-                    <?php if ($piatto['disponibile'] == 1): ?>
-                        <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
-                           class="badge badge-attivo" title="Disponibile — clicca per segnare come esaurito">✅</a>
-                    <?php else: ?>
-                        <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
-                           class="badge badge-disattivato" title="Esaurito — clicca per rendere disponibile">🚫</a>
-                    <?php endif; ?>
+                <div class="piatto-row">
+                    <div class="piatto-info">
+                        <div class="nome"><?php echo htmlspecialchars($piatto['nome']); ?></div>
+                        <?php if (!empty($piatto['descrizione'])): ?>
+                            <div class="descrizione"><?php echo htmlspecialchars($piatto['descrizione']); ?></div>
+                        <?php endif; ?>
+                        <div class="prezzo">€<?php echo number_format($piatto['prezzo'], 2, ',', '.'); ?></div>
+                    </div>
+                    <div class="piatto-azioni">
+                        <?php if ($piatto['disponibile'] == 1): ?>
+                            <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
+                               class="badge badge-attivo" title="Disponibile — clicca per segnare come esaurito">✅</a>
+                        <?php else: ?>
+                            <a href="admin.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
+                               class="badge badge-disattivato" title="Esaurito — clicca per rendere disponibile">🚫</a>
+                        <?php endif; ?>
 
-                    <a href="admin.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
-                       class="btn-elimina-icon"
-                       title="Elimina piatto"
-                       onclick="return confirm('Eliminare definitivamente <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
+                        <a href="#" class="btn-modifica-icon" title="Modifica piatto"
+                           onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
+
+                        <a href="admin.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
+                           class="btn-elimina-icon"
+                           title="Elimina piatto"
+                           onclick="return confirm('Eliminare definitivamente <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
+                    </div>
+                </div>
+
+                <!-- Form di modifica inline, nascosto finché non si clicca la matita -->
+                <div class="form-modifica" id="edit-<?php echo $piatto['id']; ?>">
+                    <form action="admin.php" method="POST">
+                        <input type="hidden" name="azione_piatto" value="modifica">
+                        <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
+
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select name="categoria_id" required>
+                                <?php foreach ($lista_categorie_edit as $cat_opt): ?>
+                                    <option value="<?php echo $cat_opt['id']; ?>" <?php echo ($cat_opt['id'] == $piatto['categoria_id']) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($cat_opt['nome']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrizione</label>
+                            <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Prezzo (€)</label>
+                            <input type="number" name="prezzo" step="0.01" required value="<?php echo $piatto['prezzo']; ?>">
+                        </div>
+
+                        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" name="disponibile" value="1" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
+                            <label style="margin:0;">Disponibile</label>
+                        </div>
+
+                        <button type="submit">Salva modifiche</button>
+                    </form>
                 </div>
             </div>
 

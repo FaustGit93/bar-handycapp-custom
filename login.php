@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Bar HandyCapp</title>
-    <link rel="stylesheet" href="style/login.css">
+    <link rel="stylesheet" href="style/login.css?v=<?php echo filemtime('style/login.css'); ?>">
 </head>
 <body>
 
