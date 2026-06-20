@@ -211,12 +211,13 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 
     <table>
         <thead>
-            <tr>
-                <th>Ordine</th>
-                <th>Nome</th>
-                <th style="text-align:center;">Sposta</th>
-                <th>Azioni</th>
-            </tr>
+           <tr>
+    <th>Ordine</th>
+    <th>Nome</th>
+    <th style="text-align:center;">Sposta</th>
+    <th style="text-align:center;">Visibilità</th>
+    <th>Azioni</th>
+</tr>
         </thead>
         <tbody>
             <?php foreach ($tutte_categorie as $i => $cat): ?>
@@ -233,6 +234,13 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                         <a href="admin.php?azione=cat_giu&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="Sposta giù">▼</a>
                     <?php else: ?>
                         <span class="freccia-disabilitata">▼</span>
+                    <?php endif; ?>
+                </td>
+                     <td style="text-align:center;">
+                    <?php if ($cat['visibile'] == 1): ?>
+                        <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=0" title="Visibile — clicca per nascondere">👁️</a>
+                    <?php else: ?>
+                        <a href="admin.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" title="Nascosta — clicca per mostrare" style="opacity:0.4;">🙈</a>
                     <?php endif; ?>
                 </td>
                 <td>

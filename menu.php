@@ -8,7 +8,8 @@ include 'connessione.php';
 
 
 
-$categorie_query = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
+$categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDER BY ordine ASC");
+
 ?>
 
 <!DOCTYPE html>
