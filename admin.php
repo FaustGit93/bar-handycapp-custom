@@ -135,13 +135,30 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
     $categoria_id = intval($_POST['categoria_id']);
     $nome = trim($_POST['nome']);
     $descrizione = trim($_POST['descrizione']);
+    $note_allergeni = trim($_POST['note_allergeni']);
     $prezzo = floatval($_POST['prezzo']);
     $disponibile = isset($_POST['disponibile']) ? 1 : 0;
 
-    $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, nome = ?, descrizione = ?, prezzo = ?, disponibile = ? WHERE id = ?");
-    $stmt->bind_param("issdii", $categoria_id, $nome, $descrizione, $prezzo, $disponibile, $id_piatto);
+    $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, nome = ?, descrizione = ?, note_allergeni = ?, prezzo = ?, disponibile = ? WHERE id = ?");
+    $stmt->bind_param("isssdii", $categoria_id, $nome, $descrizione, $note_allergeni, $prezzo, $disponibile, $id_piatto);
 
     if ($stmt->execute()) {
+        // Aggiorniamo gli allergeni: cancelliamo i vecchi e inseriamo i nuovi
+        $stmt_del = $conn->prepare("DELETE FROM piatti_allergeni WHERE piatto_id = ?");
+        $stmt_del->bind_param("i", $id_piatto);
+        $stmt_del->execute();
+        $stmt_del->close();
+
+        if (isset($_POST['allergeni']) && is_array($_POST['allergeni'])) {
+            $stmt_all = $conn->prepare("INSERT INTO piatti_allergeni (piatto_id, allergene_id) VALUES (?, ?)");
+            foreach ($_POST['allergeni'] as $id_allergene) {
+                $id_allergene = intval($id_allergene);
+                $stmt_all->bind_param("ii", $id_piatto, $id_allergene);
+                $stmt_all->execute();
+            }
+            $stmt_all->close();
+        }
+
         $messaggio = "<div class='alert success'>✅ Piatto aggiornato con successo!</div>";
     } else {
         $messaggio = "<div class='alert error'>❌ Errore durante l'aggiornamento.</div>";
@@ -348,12 +365,20 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
         }
     ?>
     <div class="piatti-lista">
-        <?php while ($piatto = $piatti_query->fetch_assoc()): ?>
+     <?php while ($piatto = $piatti_query->fetch_assoc()):
+    // Recuperiamo gli allergeni già assegnati a questo piatto
+    $id_piatto_loop = $piatto['id'];
+    $res_allergeni_piatto = $conn->query("SELECT allergene_id FROM piatti_allergeni WHERE piatto_id = $id_piatto_loop");
+    $allergeni_selezionati = [];
+    while ($ra = $res_allergeni_piatto->fetch_assoc()) {
+        $allergeni_selezionati[] = $ra['allergene_id'];
+    }
+?>
 
-            <?php if ($piatto['nome_categoria'] !== $categoria_corrente): ?>
-                <div class="categoria-header"><?php echo htmlspecialchars($piatto['nome_categoria']); ?></div>
-                <?php $categoria_corrente = $piatto['nome_categoria']; ?>
-            <?php endif; ?>
+    <?php if ($piatto['nome_categoria'] !== $categoria_corrente): ?>
+        <div class="categoria-header"><?php echo htmlspecialchars($piatto['nome_categoria']); ?></div>
+        <?php $categoria_corrente = $piatto['nome_categoria']; ?>
+    <?php endif; ?>
 
             <div class="piatto-card">
                 <div class="piatto-row">
