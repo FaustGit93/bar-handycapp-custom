@@ -8,7 +8,8 @@ $errore = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_inserita = $_POST['password'];
 
-    if ($password_inserita === ADMIN_PASSWORD) {
+   if (password_verify($password_inserita, ADMIN_PASSWORD)) {
+
         $_SESSION['admin_loggato'] = true;
         header("Location: admin_v2.php");
         exit();
