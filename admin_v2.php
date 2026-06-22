@@ -363,6 +363,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
             while ($ra = $res_allergeni_piatto->fetch_assoc()) {
                 $allergeni_selezionati[] = $ra['allergene_id'];
             }
+            $ha_allergeni_salvati = count($allergeni_selezionati) > 0 || !empty($piatto['note_allergeni']);
         ?>
 
         <?php if ($piatto['nome_categoria'] !== $categoria_corrente): ?>
@@ -398,7 +399,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                     </div>
                 </div>
 
-                <!-- Form di modifica inline, nascosto finché non si clicca la matita -->
+                <!-- Form di modifica inline -->
                 <div class="form-modifica" id="edit-<?php echo $piatto['id']; ?>">
                     <form action="admin_v2.php" method="POST">
                         <input type="hidden" name="azione_piatto" value="modifica">
@@ -425,7 +426,19 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                             <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
                         </div>
 
+                        <!-- Toggle allergeni: aperto se ha già allergeni, chiuso se no -->
                         <div class="form-group">
+                            <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
+                                <input type="checkbox"
+                                       id="toggle-allergeni-<?php echo $piatto['id']; ?>"
+                                       onclick="document.getElementById('blocco-allergeni-<?php echo $piatto['id']; ?>').classList.toggle('aperto');"
+                                       style="width:auto;"
+                                       <?php echo $ha_allergeni_salvati ? 'checked' : ''; ?>>
+                                Questo piatto contiene allergeni?
+                            </label>
+                        </div>
+                        <div class="form-group blocco-allergeni-toggle <?php echo $ha_allergeni_salvati ? 'aperto' : ''; ?>"
+                             id="blocco-allergeni-<?php echo $piatto['id']; ?>">
                             <label>Allergeni</label>
                             <div class="allergeni-grid">
                                 <?php foreach ($tutti_allergeni as $allergene): ?>
@@ -436,10 +449,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                                     </label>
                                 <?php endforeach; ?>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Note allergeni (facoltativo)</label>
+                            <label style="margin-top:10px;">Note allergeni (facoltativo)</label>
                             <input type="text" name="note_allergeni" value="<?php echo htmlspecialchars($piatto['note_allergeni'] ?? ''); ?>">
                         </div>
 
