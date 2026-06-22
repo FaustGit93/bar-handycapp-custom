@@ -4,6 +4,7 @@ config.php
 connessione.php
 config_off.php
 genera_hash.php
+test_hash.php
 
 
 # --- FILE DI SISTEMA & IDE ---
