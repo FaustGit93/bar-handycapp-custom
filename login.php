@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
 <div class="login-box">
-    <h2>Area Riservata</h2>
+    <h2>Area ciao</h2>
     <p>Inserisci la password amministratore</p>
 
     <?php if (!empty($errore)) echo "<div class='error'>$errore</div>"; ?>
