@@ -6,7 +6,7 @@ if (!isset($_SESSION['admin_loggato']) || $_SESSION['admin_loggato'] !== true) {
     exit();
 }
 
-include 'connessione.php'
+include 'connessione.php';
 
 $messaggio = "";
 $messaggio_cat = "";
