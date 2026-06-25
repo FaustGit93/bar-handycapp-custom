@@ -22,6 +22,9 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 </head>
 <body>
 
+<footer>
+</footer>
+
     <nav class="sticky-nav">
         <?php
         while ($cat = $categorie_query->fetch_assoc()) {
@@ -91,6 +94,9 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         }
         ?>
     </div>
+
+    <footer>
+    </footer>
 
 </body>
 </html>
