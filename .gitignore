@@ -6,6 +6,7 @@ config_off.php
 genera_hash.php
 test_hash.php
 config_on.php
+roadmap.md
 
 # --- FILE DI SISTEMA & IDE ---
 # File generati dal sistema operativo (es. Mac o Windows)
