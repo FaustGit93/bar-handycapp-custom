@@ -1,14 +1,20 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 
 if (!isset($_SESSION['admin_loggato']) || $_SESSION['admin_loggato'] !== true) {
     header("Location: login.php");
     exit();
 }
+
+// Gestiamo il cambio lingua tramite URL
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['it', 'en', 'pt'])) {
+    setcookie('lingua', $_GET['lang'], time() + (60 * 60 * 24 * 365), '/');
+    $_COOKIE['lingua'] = $_GET['lang'];
+}
+
+// Leggiamo la lingua dal cookie, default inglese
+$lang = $_COOKIE['lingua'] ?? 'en';
+include "lang/$lang.php";
 
 include 'connessione.php';
 
@@ -24,9 +30,9 @@ if (isset($_POST['azione_cat']) && $_POST['azione_cat'] == 'aggiungi') {
     $stmt = $conn->prepare("INSERT INTO categorie (nome, ordine) VALUES (?, ?)");
     $stmt->bind_param("si", $nome_cat, $prossimo_ordine);
     if ($stmt->execute()) {
-        $messaggio_cat = "<div class='alert success'>✅ Categoria aggiunta!</div>";
+        $messaggio_cat = "<div class='alert success'>" . $t['cat_aggiunta'] . "</div>";
     } else {
-        $messaggio_cat = "<div class='alert error'>❌ Errore durante l'inserimento.</div>";
+        $messaggio_cat = "<div class='alert error'>" . $t['cat_errore_ins'] . "</div>";
     }
     $stmt->close();
 }
@@ -41,14 +47,14 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'elimina_cat' && isset($_GET['i
     $check->close();
 
     if ($risultato['totale'] > 0) {
-        $messaggio_cat = "<div class='alert error'>⚠️ Impossibile eliminare: ci sono <strong>" . $risultato['totale'] . " piatti</strong> in questa categoria. Eliminali prima.</div>";
+        $messaggio_cat = "<div class='alert error'>⚠️ " . $t['cat_impossibile_el'] . " <strong>" . $risultato['totale'] . "</strong> " . $t['cat_impossibile_el2'] . "</div>";
     } else {
         $stmt = $conn->prepare("DELETE FROM categorie WHERE id = ?");
         $stmt->bind_param("i", $id_cat);
         if ($stmt->execute()) {
-            $messaggio_cat = "<div class='alert success'>🗑️ Categoria eliminata!</div>";
+            $messaggio_cat = "<div class='alert success'>" . $t['cat_eliminata'] . "</div>";
         } else {
-            $messaggio_cat = "<div class='alert error'>❌ Errore durante l'eliminazione.</div>";
+            $messaggio_cat = "<div class='alert error'>" . $t['cat_errore_el'] . "</div>";
         }
         $stmt->close();
     }
@@ -111,9 +117,9 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'elimina' && isset($_GET['id'])
     $stmt = $conn->prepare("DELETE FROM piatti WHERE id = ?");
     $stmt->bind_param("i", $id_da_eliminare);
     if ($stmt->execute()) {
-        $messaggio = "<div class='alert success'>🗑️ Piatto eliminato con successo!</div>";
+        $messaggio = "<div class='alert success'>" . $t['piatto_eliminato'] . "</div>";
     } else {
-        $messaggio = "<div class='alert error'>❌ Errore durante l'eliminazione.</div>";
+        $messaggio = "<div class='alert error'>" . $t['piatto_errore_el'] . "</div>";
     }
     $stmt->close();
 }
@@ -159,9 +165,9 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
             $stmt_all->close();
         }
 
-        $messaggio = "<div class='alert success'>✅ Piatto aggiornato con successo!</div>";
+        $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>";
     } else {
-        $messaggio = "<div class='alert error'>❌ Errore durante l'aggiornamento.</div>";
+        $messaggio = "<div class='alert error'>" . $t['piatto_errore_agg'] . "</div>";
     }
     $stmt->close();
 }
@@ -190,9 +196,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !iss
             $stmt_all->close();
         }
 
-        $messaggio = "<div class='alert success'>✅ Piatto inserito con successo!</div>";
+        $messaggio = "<div class='alert success'>" . $t['piatto_inserito'] . "</div>";
     } else {
-        $messaggio = "<div class='alert error'>❌ Errore durante l'inserimento.</div>";
+        $messaggio = "<div class='alert error'>" . $t['piatto_errore_ins'] . "</div>";
     }
     $stmt->close();
 }
@@ -215,43 +221,69 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 ?>
 
 <!DOCTYPE html>
-<html lang="it">
+<html lang="<?php echo $lang; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello Admin - Bar Handy</title>
+    <!-- <title><?php echo $t['pannello_admin']; ?></title> -->
+    <title>Bar HandyCapp - Admin</title>
     <link rel="stylesheet" href="style/admin.css">
 </head>
 <body>
 
 <div class="container">
 
-    <a href="logout.php" style="color: #dc3545; float: right; font-weight: bold; text-decoration: none;">Esci (Logout)</a>
-    <h1>Pannello Admin</h1>
+<div class="admin-topbar">
+    <div class="admin-topbar-left">
+        <a href="logout.php" class="btn-logout"><?php echo $t['esci']; ?></a>
+    </div>
+    <div class="lang-switcher">
+        <input type="checkbox" id="lang-toggle" class="lang-toggle-input">
+        <label for="lang-toggle" class="lang-selected">
+            <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
+            <?php echo $lang === 'it' ? 'Italiano' : ($lang === 'pt' ? 'Português' : 'English'); ?>
+            <span class="lang-arrow">▾</span>
+        </label>
+        <div class="lang-options">
+            <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
+                <img src="https://flagcdn.com/w40/it.png" width="24" height="18"> Italiano
+            </a>
+            <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
+                <img src="https://flagcdn.com/w40/gb.png" width="24" height="18"> English
+            </a>
+            <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
+                <img src="https://flagcdn.com/w40/br.png" width="24" height="18"> Português
+            </a>
+        </div>
+    </div>
+</div>
+            <h1><?php echo $t['pannello_admin']; ?></h1>
+
+    
 
     <!-- ===== SEZIONE CATEGORIE ===== -->
-    <h2>📂 Gestione Categorie</h2>
+    <h2><?php echo $t['gestione_categorie']; ?></h2>
     <?php echo $messaggio_cat; ?>
 
     <form action="admin_v2.php" method="POST">
         <input type="hidden" name="azione_cat" value="aggiungi">
         <div class="form-inline">
             <div class="form-group">
-                <label>Nome Categoria</label>
-                <input type="text" name="nome_categoria" required placeholder="Es. Cocktail, Panini...">
+                <label><?php echo $t['nome_categoria']; ?></label>
+                <input type="text" name="nome_categoria" required placeholder="<?php echo $t['placeholder_categoria']; ?>">
             </div>
-            <button type="submit" class="btn-verde">+ Aggiungi</button>
+            <button type="submit" class="btn-verde"><?php echo $t['aggiungi']; ?></button>
         </div>
     </form>
 
     <table>
         <thead>
             <tr>
-                <th>Ordine</th>
-                <th>Nome</th>
-                <th style="text-align:center;">Sposta</th>
-                <th style="text-align:center;">Visibilità</th>
-                <th>Azioni</th>
+                <th><?php echo $t['col_ordine']; ?></th>
+                <th><?php echo $t['col_nome']; ?></th>
+                <th style="text-align:center;"><?php echo $t['col_sposta']; ?></th>
+                <th style="text-align:center;"><?php echo $t['col_visibilita']; ?></th>
+                <th><?php echo $t['col_azioni']; ?></th>
             </tr>
         </thead>
         <tbody>
@@ -261,30 +293,30 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                 <td><strong><?php echo htmlspecialchars($cat['nome']); ?></strong></td>
                 <td style="text-align:center;">
                     <?php if ($i > 0): ?>
-                        <a href="admin_v2.php?azione=cat_su&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="Sposta su">▲</a>
+                        <a href="admin_v2.php?azione=cat_su&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="▲">▲</a>
                     <?php else: ?>
                         <span class="freccia-disabilitata">▲</span>
                     <?php endif; ?>
                     <?php if ($i < $totale_cat - 1): ?>
-                        <a href="admin_v2.php?azione=cat_giu&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="Sposta giù">▼</a>
+                        <a href="admin_v2.php?azione=cat_giu&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="▼">▼</a>
                     <?php else: ?>
                         <span class="freccia-disabilitata">▼</span>
                     <?php endif; ?>
                 </td>
                 <td style="text-align:center;">
                     <?php if ($cat['visibile'] == 1): ?>
-                        <a href="admin_v2.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=0" title="Visibile — clicca per nascondere" style="text-decoration:none;">👁️</a>
+                        <a href="admin_v2.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=0" title="<?php echo $t['title_visibile']; ?>" style="text-decoration:none;">👁️</a>
                     <?php else: ?>
-                        <a href="admin_v2.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" title="Nascosta — clicca per mostrare" style="opacity:0.4; text-decoration:none;">🚫</a>
+                        <a href="admin_v2.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" title="<?php echo $t['title_nascosta']; ?>" style="opacity:0.4; text-decoration:none;">🚫</a>
                     <?php endif; ?>
                 </td>
                 <td>
-                    <a href="admin_v2.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina" onclick="return confirm('Eliminare questa categoria? Assicurati che non contenga piatti.');">Elimina</a>
+                    <a href="admin_v2.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina" onclick="return confirm('<?php echo $t['confirm_elimina_cat']; ?>');"><?php echo $t['elimina']; ?></a>
                 </td>
             </tr>
             <?php endforeach; ?>
             <?php if ($totale_cat === 0): ?>
-                <tr><td colspan="5" style="text-align:center;">Nessuna categoria presente.</td></tr>
+                <tr><td colspan="5" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -292,36 +324,36 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <hr>
 
     <!-- ===== FORM NUOVO PIATTO ===== -->
-    <h2>🍽️ Nuovo Piatto / Drink</h2>
+    <h2><?php echo $t['nuovo_piatto']; ?></h2>
     <?php echo $messaggio; ?>
 
     <form action="admin_v2.php" method="POST">
         <div class="form-group">
-            <label for="categoria_id">Categoria del Menu</label>
+            <label for="categoria_id"><?php echo $t['categoria_menu']; ?></label>
             <select name="categoria_id" id="categoria_id" required>
-                <option value="">-- Seleziona una categoria --</option>
+                <option value=""><?php echo $t['seleziona_categoria']; ?></option>
                 <?php while ($cat = $categorie_per_form->fetch_assoc()): ?>
                     <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['nome']); ?></option>
                 <?php endwhile; ?>
             </select>
         </div>
         <div class="form-group">
-            <label for="nome">Nome del Prodotto</label>
-            <input type="text" name="nome" id="nome" required placeholder="Es. Spritz Aperol">
+            <label for="nome"><?php echo $t['nome_prodotto']; ?></label>
+            <input type="text" name="nome" id="nome" required placeholder="<?php echo $t['placeholder_prodotto']; ?>">
         </div>
         <div class="form-group">
-            <label for="descrizione">Descrizione / Ingredienti</label>
+            <label for="descrizione"><?php echo $t['descrizione']; ?></label>
             <textarea name="descrizione" id="descrizione" rows="2"></textarea>
         </div>
 
         <div class="form-group">
             <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
                 <input type="checkbox" id="toggle-allergeni" onclick="document.getElementById('blocco-allergeni').classList.toggle('aperto');" style="width:auto;">
-                Questo piatto contiene allergeni?
+                <?php echo $t['contiene_allergeni']; ?>
             </label>
         </div>
         <div class="form-group blocco-allergeni-toggle" id="blocco-allergeni">
-            <label>Allergeni</label>
+            <label><?php echo $t['allergeni']; ?></label>
             <div class="allergeni-grid">
                 <?php foreach ($tutti_allergeni as $allergene): ?>
                     <label class="allergene-checkbox">
@@ -330,26 +362,26 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                     </label>
                 <?php endforeach; ?>
             </div>
-            <label for="note_allergeni" style="margin-top:10px;">Note allergeni (facoltativo)</label>
-            <input type="text" name="note_allergeni" id="note_allergeni" placeholder="Es. tracce di frutta a guscio">
+            <label for="note_allergeni" style="margin-top:10px;"><?php echo $t['note_allergeni']; ?></label>
+            <input type="text" name="note_allergeni" id="note_allergeni" placeholder="<?php echo $t['placeholder_note']; ?>">
         </div>
 
         <div class="form-group">
-            <label for="prezzo">Prezzo (€)</label>
+            <label for="prezzo"><?php echo $t['prezzo']; ?></label>
             <input type="number" name="prezzo" id="prezzo" step="0.01" required>
         </div>
 
         <div class="form-group" style="display:flex; align-items:center; gap:10px;">
             <input type="checkbox" name="disponibile" id="disponibile" value="1" checked>
-            <label for="disponibile" style="margin:0;">Disponibile subito sul sito</label>
+            <label for="disponibile" style="margin:0;"><?php echo $t['disponibile_subito']; ?></label>
         </div>
-        <button type="submit">Aggiungi al Menu</button>
+        <button type="submit"><?php echo $t['aggiungi_menu']; ?></button>
     </form>
 
     <hr>
 
     <!-- ===== LISTA PIATTI A CARD ===== -->
-    <h2>📋 Piatti in Menu</h2>
+    <h2><?php echo $t['piatti_in_menu']; ?></h2>
 
     <?php if ($piatti_query->num_rows > 0):
         $categoria_corrente = null;
@@ -387,19 +419,19 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                     <div class="piatto-azioni">
                         <?php if ($piatto['disponibile'] == 1): ?>
                             <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
-                               class="badge badge-attivo" title="Disponibile — clicca per segnare come esaurito">✅</a>
+                               class="badge badge-attivo" title="<?php echo $t['title_disponibile']; ?>">✅</a>
                         <?php else: ?>
                             <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
-                               class="badge badge-disattivato" title="Esaurito — clicca per rendere disponibile">🚫</a>
+                               class="badge badge-disattivato" title="<?php echo $t['title_esaurito']; ?>">🚫</a>
                         <?php endif; ?>
 
-                        <a href="#" class="btn-modifica-icon" title="Modifica piatto"
+                        <a href="#" class="btn-modifica-icon" title="<?php echo $t['title_modifica']; ?>"
                            onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
 
                         <a href="admin_v2.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
                            class="btn-elimina-icon"
-                           title="Elimina piatto"
-                           onclick="return confirm('Eliminare definitivamente <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
+                           title="<?php echo $t['title_elimina']; ?>"
+                           onclick="return confirm('<?php echo $t['confirm_elimina_piatto']; ?> <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
                     </div>
                 </div>
 
@@ -410,7 +442,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                         <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
 
                         <div class="form-group">
-                            <label>Categoria</label>
+                            <label><?php echo $t['categoria_label']; ?></label>
                             <select name="categoria_id" required>
                                 <?php foreach ($lista_categorie_edit as $cat_opt): ?>
                                     <option value="<?php echo $cat_opt['id']; ?>" <?php echo ($cat_opt['id'] == $piatto['categoria_id']) ? 'selected' : ''; ?>>
@@ -421,12 +453,12 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                         </div>
 
                         <div class="form-group">
-                            <label>Nome</label>
+                            <label><?php echo $t['nome_label']; ?></label>
                             <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
                         </div>
 
                         <div class="form-group">
-                            <label>Descrizione</label>
+                            <label><?php echo $t['descrizione_label']; ?></label>
                             <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
                         </div>
 
@@ -438,12 +470,12 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                                        onclick="document.getElementById('blocco-allergeni-<?php echo $piatto['id']; ?>').classList.toggle('aperto');"
                                        style="width:auto;"
                                        <?php echo $ha_allergeni_salvati ? 'checked' : ''; ?>>
-                                Questo piatto contiene allergeni?
+                                <?php echo $t['contiene_allergeni']; ?>
                             </label>
                         </div>
                         <div class="form-group blocco-allergeni-toggle <?php echo $ha_allergeni_salvati ? 'aperto' : ''; ?>"
                              id="blocco-allergeni-<?php echo $piatto['id']; ?>">
-                            <label>Allergeni</label>
+                            <label><?php echo $t['allergeni']; ?></label>
                             <div class="allergeni-grid">
                                 <?php foreach ($tutti_allergeni as $allergene): ?>
                                     <label class="allergene-checkbox">
@@ -453,21 +485,21 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                                     </label>
                                 <?php endforeach; ?>
                             </div>
-                            <label style="margin-top:10px;">Note allergeni (facoltativo)</label>
+                            <label style="margin-top:10px;"><?php echo $t['note_allergeni']; ?></label>
                             <input type="text" name="note_allergeni" value="<?php echo htmlspecialchars($piatto['note_allergeni'] ?? ''); ?>">
                         </div>
 
                         <div class="form-group">
-                            <label>Prezzo (€)</label>
+                            <label><?php echo $t['prezzo']; ?></label>
                             <input type="number" name="prezzo" step="0.01" required value="<?php echo $piatto['prezzo']; ?>">
                         </div>
 
                         <div class="form-group" style="display:flex; align-items:center; gap:10px;">
                             <input type="checkbox" name="disponibile" value="1" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
-                            <label style="margin:0;">Disponibile</label>
+                            <label style="margin:0;"><?php echo $t['disponibile_label']; ?></label>
                         </div>
 
-                        <button type="submit">Salva modifiche</button>
+                        <button type="submit"><?php echo $t['salva_modifiche']; ?></button>
                     </form>
                 </div>
             </div>
@@ -475,7 +507,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
         <?php endwhile; ?>
     </div>
     <?php else: ?>
-        <p style="color:#888; text-align:center; margin-top:20px;">Nessun piatto presente nel database.</p>
+        <p style="color:#888; text-align:center; margin-top:20px;"><?php echo $t['nessun_piatto']; ?></p>
     <?php endif; ?>
 
 </div>

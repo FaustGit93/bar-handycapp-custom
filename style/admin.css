@@ -1,7 +1,39 @@
 * { box-sizing: border-box; }
 body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; color: #333; padding: 20px; }
 .container { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-h1, h2 { color: #111; }
+
+/* ── Topbar admin ── */
+.admin-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.admin-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+
+
+.btn-logout {
+    color: #dc3545;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.btn-logout:hover { text-decoration: underline; }
+
+
+h1 { color: #111; text-align: center; margin-bottom: 20px; }
+
+h2 { color: #111; }
+
+
+
 .form-group { margin-bottom: 15px; }
 label { display: block; margin-bottom: 5px; font-weight: 600; }
 input[type="text"], input[type="number"], textarea, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
@@ -26,8 +58,6 @@ th { background-color: #f8f9fa; }
 .btn-freccia { text-decoration: none; font-size: 16px; padding: 0 3px; }
 .btn-freccia:hover { opacity: 0.6; }
 .freccia-disabilitata { color: #ccc; font-size: 16px; padding: 0 3px; }
-
-
 
 /* ── Card piatti ── */
 .piatti-lista { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
@@ -54,7 +84,6 @@ th { background-color: #f8f9fa; }
 .categoria-header:first-child { margin-top: 0; }
 
 /* ── Form modifica inline ── */
-
 .form-modifica {
     display: grid;
     grid-template-rows: 0fr;
@@ -66,13 +95,8 @@ th { background-color: #f8f9fa; }
     grid-template-rows: 1fr;
     margin-top: 14px;
 }
-.form-modifica > form {
-    min-height: 0;
-}
-
+.form-modifica > form { min-height: 0; }
 .form-modifica button { width: auto; padding: 8px 20px; align-self: flex-start; }
-
-
 
 .blocco-allergeni-toggle {
     max-height: 0;
@@ -105,3 +129,17 @@ th { background-color: #f8f9fa; }
     cursor: pointer;
 }
 .allergene-checkbox input { width: auto; }
+
+/* ── Selettore lingua admin ── */
+.lang-switcher { position: relative; display: inline-block; }
+.lang-switcher input[type="checkbox"] { display: none !important; position: absolute !important; opacity: 0 !important; }
+.lang-selected { display: flex; align-items: center; gap: 8px; background: #f8f9fa; border: 1px solid #ddd; color: #333; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 13px; user-select: none; }
+.lang-selected:hover { background: #e9ecef; }
+.lang-arrow { font-size: 10px; opacity: 0.6; transition: transform .2s; }
+.lang-switcher input[type="checkbox"]:checked ~ .lang-selected .lang-arrow { transform: rotate(180deg); }
+.lang-options { display: none; position: absolute; top: calc(100% + 4px); right: 0; background: #fff; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; min-width: 140px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.lang-switcher input[type="checkbox"]:checked ~ .lang-options { display: block; }
+.lang-options a { display: flex; align-items: center; gap: 8px; padding: 8px 12px; color: #555; text-decoration: none; font-size: 13px; }
+.lang-options a:hover { background: #f8f9fa; color: #333; }
+.lang-options a.attiva { font-weight: bold; color: #111; background: #f0f0f0; }
+.lang-options a img, .lang-selected img { width: 24px; height: 18px; object-fit: cover; border-radius: 2px; }
