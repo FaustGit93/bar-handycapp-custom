@@ -4,3 +4,94 @@ input[type="password"] { width: 100%; padding: 10px; margin: 15px 0; border: 1px
 button { background-color: #ffc107; color: #000; border: none; padding: 12px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; }
 button:hover { background-color: #e0a800; }
 .error { color: #dc3545; font-size: 14px; margin-bottom: 15px; }
+
+/* ── Selettore lingua dropdown ── */
+.lang-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Nasconde il checkbox ma lo mantiene funzionante */
+.lang-toggle-input {
+    display: none;
+}
+
+.lang-selected {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #333;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    user-select: none;
+}
+
+.lang-selected:hover {
+    background: #444;
+}
+
+.lang-arrow {
+    font-size: 11px;
+    opacity: 0.7;
+    transition: transform .2s;
+}
+
+/* Ruota la freccia quando il dropdown è aperto */
+.lang-toggle-input:checked ~ .lang-selected .lang-arrow {
+    transform: rotate(180deg);
+}
+
+.lang-options {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 6px;
+    overflow: hidden;
+    min-width: 140px;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+/* Mostra il dropdown quando il checkbox è spuntato */
+.lang-toggle-input:checked ~ .lang-options {
+    display: block;
+}
+
+.lang-options a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    color: #ccc;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.lang-options a:hover {
+    background: #444;
+    color: #fff;
+}
+
+.lang-options a.attiva {
+    color: #fff;
+    font-weight: bold;
+    background: #3a3a3a;
+}
+
+.lang-options a img,
+.lang-selected img {
+    width: 24px;
+    height: 18px;
+    object-fit: cover;
+    border-radius: 2px;
+}
