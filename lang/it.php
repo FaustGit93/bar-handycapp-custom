@@ -1,5 +1,7 @@
 <?php
 $t = [
+
+    'traduci_nome' => 'Traduci il nome automaticamente',  // it.php
     // Login
     'titolo'                    => 'Area Riservata',
     'sottotitolo'               => 'Inserisci la password amministratore',

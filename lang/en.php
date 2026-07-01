@@ -1,5 +1,8 @@
 <?php
 $t = [
+    
+    'traduci_nome' => 'Automatically translate the name', // en.php
+
     // Login
     'titolo'                    => 'Restricted Area',
     'sottotitolo'               => 'Enter the administrator password',

@@ -1,5 +1,8 @@
 <?php
 $t = [
+    
+    'traduci_nome' => 'Traduzir o nome automaticamente',  // pt.php
+
     // Login
     'titolo'                    => 'Área Restrita',
     'sottotitolo'               => 'Digite a senha do administrador',
