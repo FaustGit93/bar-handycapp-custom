@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: admin_v2.php");
         exit();
     } else {
-        $errore = $t['errore'];
+        $errore = $t['errore_password'];
     }
 }
 ?>
