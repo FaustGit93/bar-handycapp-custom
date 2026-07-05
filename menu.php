@@ -125,7 +125,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
     <div class="lang-fab">
         <input type="checkbox" id="lang-toggle-menu" class="lang-toggle-input">
         <label for="lang-toggle-menu" class="lang-selected-menu">
-            <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
+            <img src="https://flagcdn.com/h40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
         </label>
         <div class="lang-options-menu">
             <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
