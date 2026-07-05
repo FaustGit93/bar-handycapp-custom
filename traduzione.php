@@ -7,20 +7,35 @@
  * @param string $a         Lingua destinazione (es. 'en')
  * @return string|null      Il testo tradotto oppure null in caso di errore
  */
+
+
 function traduci($testo, $da, $a) {
     if (empty(trim($testo))) return null;
     if ($da === $a) return $testo;
 
     $url = 'https://api.mymemory.translated.net/get?q=' . urlencode($testo) . '&langpair=' . $da . '|' . $a;
 
-    $risposta = @file_get_contents($url);
-    if (!$risposta) return null;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $risposta = curl_exec($ch);
+    $errore_curl = curl_error($ch);
+    curl_close($ch);
+
+    if (!$risposta) {
+        error_log("Errore traduzione cURL: " . $errore_curl);
+        return null;
+    }
 
     $json = json_decode($risposta, true);
     if (!$json || $json['responseStatus'] !== 200) return null;
 
     return $json['responseData']['translatedText'];
 }
+
+
 
 /**
  * Salva o aggiorna una traduzione nel database
