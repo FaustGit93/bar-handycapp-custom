@@ -140,5 +140,6 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         </div>
     </div>
 
+    
 </body>
 </html>
