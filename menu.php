@@ -129,7 +129,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         </label>
         <div class="lang-options-menu">
             <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
-                <img src="https://flagcdn.com/w40/it.png" width="20" height="15"> IT
+                <img src="https://flagcdn.com/h40/it.png" width="20" height="15"> IT
             </a>
             <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
                 <img src="https://flagcdn.com/w40/gb.png" width="20" height="15"> EN
