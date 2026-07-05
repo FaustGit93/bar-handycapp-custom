@@ -1,8 +1,19 @@
 <?php
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 include 'config.php';
 include 'connessione.php';
@@ -140,6 +151,6 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         </div>
     </div>
 
-    
+
 </body>
 </html>
