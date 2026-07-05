@@ -6,6 +6,8 @@ if (!isset($_SESSION['admin_loggato']) || $_SESSION['admin_loggato'] !== true) {
     exit();
 }
 
+include 'config.php';
+
 // Gestiamo il cambio lingua tramite URL
 if (isset($_GET['lang']) && in_array($_GET['lang'], ['it', 'en', 'pt'])) {
     setcookie('lingua', $_GET['lang'], time() + (60 * 60 * 24 * 365), '/');
@@ -17,6 +19,7 @@ $lang = $_COOKIE['lingua'] ?? 'en';
 include "lang/$lang.php";
 
 include 'connessione.php';
+require_once 'traduzione.php';
 
 $messaggio = "";
 $messaggio_cat = "";
@@ -30,6 +33,8 @@ if (isset($_POST['azione_cat']) && $_POST['azione_cat'] == 'aggiungi') {
     $stmt = $conn->prepare("INSERT INTO categorie (nome, ordine) VALUES (?, ?)");
     $stmt->bind_param("si", $nome_cat, $prossimo_ordine);
     if ($stmt->execute()) {
+        $nuova_id_cat = $stmt->insert_id;
+        traduci_e_salva_tutto($conn, 'categorie', $nuova_id_cat, 'nome', $nome_cat);
         $messaggio_cat = "<div class='alert success'>" . $t['cat_aggiunta'] . "</div>";
     } else {
         $messaggio_cat = "<div class='alert error'>" . $t['cat_errore_ins'] . "</div>";
@@ -49,6 +54,11 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'elimina_cat' && isset($_GET['i
     if ($risultato['totale'] > 0) {
         $messaggio_cat = "<div class='alert error'>⚠️ " . $t['cat_impossibile_el'] . " <strong>" . $risultato['totale'] . "</strong> " . $t['cat_impossibile_el2'] . "</div>";
     } else {
+        $stmt_tr = $conn->prepare("DELETE FROM traduzioni WHERE tabella = 'categorie' AND riga_id = ?");
+        $stmt_tr->bind_param("i", $id_cat);
+        $stmt_tr->execute();
+        $stmt_tr->close();
+
         $stmt = $conn->prepare("DELETE FROM categorie WHERE id = ?");
         $stmt->bind_param("i", $id_cat);
         if ($stmt->execute()) {
@@ -114,6 +124,12 @@ if (isset($_GET['azione']) && in_array($_GET['azione'], ['cat_su', 'cat_giu']) &
 // --- LOGICA PIATTI: ELIMINAZIONE ---
 if (isset($_GET['azione']) && $_GET['azione'] == 'elimina' && isset($_GET['id'])) {
     $id_da_eliminare = intval($_GET['id']);
+
+    $stmt_tr = $conn->prepare("DELETE FROM traduzioni WHERE tabella = 'piatti' AND riga_id = ?");
+    $stmt_tr->bind_param("i", $id_da_eliminare);
+    $stmt_tr->execute();
+    $stmt_tr->close();
+
     $stmt = $conn->prepare("DELETE FROM piatti WHERE id = ?");
     $stmt->bind_param("i", $id_da_eliminare);
     if ($stmt->execute()) {
@@ -145,6 +161,7 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
     $note_allergeni = trim($_POST['note_allergeni']);
     $prezzo = floatval($_POST['prezzo']);
     $disponibile = isset($_POST['disponibile']) ? 1 : 0;
+    $traduci_nome = isset($_POST['traduci_nome']) ? 1 : 0;
 
     $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, nome = ?, descrizione = ?, note_allergeni = ?, prezzo = ?, disponibile = ? WHERE id = ?");
     $stmt->bind_param("isssdii", $categoria_id, $nome, $descrizione, $note_allergeni, $prezzo, $disponibile, $id_piatto);
@@ -165,6 +182,18 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
             $stmt_all->close();
         }
 
+        if ($traduci_nome) {
+            traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'nome', $nome);
+        } else {
+            $stmt_del_tr = $conn->prepare("DELETE FROM traduzioni WHERE tabella = 'piatti' AND riga_id = ? AND campo = 'nome'");
+            $stmt_del_tr->bind_param("i", $id_piatto);
+            $stmt_del_tr->execute();
+            $stmt_del_tr->close();
+        }
+        if (!empty($descrizione)) {
+            traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'descrizione', $descrizione);
+        }
+
         $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>";
     } else {
         $messaggio = "<div class='alert error'>" . $t['piatto_errore_agg'] . "</div>";
@@ -180,6 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !iss
     $note_allergeni = trim($_POST['note_allergeni']);
     $prezzo = floatval($_POST['prezzo']);
     $disponibile = isset($_POST['disponibile']) ? 1 : 0;
+    $traduci_nome = isset($_POST['traduci_nome']) ? 1 : 0;
 
     $stmt = $conn->prepare("INSERT INTO piatti (categoria_id, nome, descrizione, note_allergeni, prezzo, disponibile) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("issssi", $categoria_id, $nome, $descrizione, $note_allergeni, $prezzo, $disponibile);
@@ -194,6 +224,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !iss
                 $stmt_all->execute();
             }
             $stmt_all->close();
+        }
+
+        if ($traduci_nome) {
+            traduci_e_salva_tutto($conn, 'piatti', $nuovo_id_piatto, 'nome', $nome);
+        }
+        if (!empty($descrizione)) {
+            traduci_e_salva_tutto($conn, 'piatti', $nuovo_id_piatto, 'descrizione', $descrizione);
         }
 
         $messaggio = "<div class='alert success'>" . $t['piatto_inserito'] . "</div>";
@@ -225,7 +262,6 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title><?php echo $t['pannello_admin']; ?></title> -->
     <title>Bar HandyCapp - Admin</title>
     <link rel="stylesheet" href="style/admin.css">
 </head>
@@ -233,33 +269,32 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 
 <div class="container">
 
-<div class="admin-topbar">
-    <div class="admin-topbar-left">
-        <a href="logout.php" class="btn-logout"><?php echo $t['esci']; ?></a>
-    </div>
-    <div class="lang-switcher">
-        <input type="checkbox" id="lang-toggle" class="lang-toggle-input">
-        <label for="lang-toggle" class="lang-selected">
-            <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
-            <?php echo $lang === 'it' ? 'Italiano' : ($lang === 'pt' ? 'Português' : 'English'); ?>
-            <span class="lang-arrow">▾</span>
-        </label>
-        <div class="lang-options">
-            <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
-                <img src="https://flagcdn.com/w40/it.png" width="24" height="18"> Italiano
-            </a>
-            <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
-                <img src="https://flagcdn.com/w40/gb.png" width="24" height="18"> English
-            </a>
-            <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
-                <img src="https://flagcdn.com/w40/br.png" width="24" height="18"> Português
-            </a>
+    <div class="admin-topbar">
+        <div class="admin-topbar-left">
+            <a href="logout.php" class="btn-logout"><?php echo $t['esci']; ?></a>
+        </div>
+        <div class="lang-switcher">
+            <input type="checkbox" id="lang-toggle" class="lang-toggle-input">
+            <label for="lang-toggle" class="lang-selected">
+                <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
+                <?php echo $lang === 'it' ? 'Italiano' : ($lang === 'pt' ? 'Português' : 'English'); ?>
+                <span class="lang-arrow">▾</span>
+            </label>
+            <div class="lang-options">
+                <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
+                    <img src="https://flagcdn.com/w40/it.png" width="24" height="18"> Italiano
+                </a>
+                <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
+                    <img src="https://flagcdn.com/w40/gb.png" width="24" height="18"> English
+                </a>
+                <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
+                    <img src="https://flagcdn.com/w40/br.png" width="24" height="18"> Português
+                </a>
+            </div>
         </div>
     </div>
-</div>
-            <h1><?php echo $t['pannello_admin']; ?></h1>
 
-    
+    <h1><?php echo $t['pannello_admin']; ?></h1>
 
     <!-- ===== SEZIONE CATEGORIE ===== -->
     <h2><?php echo $t['gestione_categorie']; ?></h2>
@@ -293,12 +328,12 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                 <td><strong><?php echo htmlspecialchars($cat['nome']); ?></strong></td>
                 <td style="text-align:center;">
                     <?php if ($i > 0): ?>
-                        <a href="admin_v2.php?azione=cat_su&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="▲">▲</a>
+                        <a href="admin_v2.php?azione=cat_su&id=<?php echo $cat['id']; ?>" class="btn-freccia">▲</a>
                     <?php else: ?>
                         <span class="freccia-disabilitata">▲</span>
                     <?php endif; ?>
                     <?php if ($i < $totale_cat - 1): ?>
-                        <a href="admin_v2.php?azione=cat_giu&id=<?php echo $cat['id']; ?>" class="btn-freccia" title="▼">▼</a>
+                        <a href="admin_v2.php?azione=cat_giu&id=<?php echo $cat['id']; ?>" class="btn-freccia">▼</a>
                     <?php else: ?>
                         <span class="freccia-disabilitata">▼</span>
                     <?php endif; ?>
@@ -346,6 +381,11 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
             <textarea name="descrizione" id="descrizione" rows="2"></textarea>
         </div>
 
+        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" name="traduci_nome" id="traduci_nome" value="1" checked style="width:auto;">
+            <label for="traduci_nome" style="margin:0;"><?php echo $t['traduci_nome'] ?? 'Traduci il nome automaticamente'; ?></label>
+        </div>
+
         <div class="form-group">
             <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
                 <input type="checkbox" id="toggle-allergeni" onclick="document.getElementById('blocco-allergeni').classList.toggle('aperto');" style="width:auto;">
@@ -358,7 +398,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                 <?php foreach ($tutti_allergeni as $allergene): ?>
                     <label class="allergene-checkbox">
                         <input type="checkbox" name="allergeni[]" value="<?php echo $allergene['id']; ?>">
-                        <?php echo htmlspecialchars($allergene['nome']); ?>
+                        <?php echo htmlspecialchars($t[$allergene['chiave']] ?? $allergene['nome']); ?>
                     </label>
                 <?php endforeach; ?>
             </div>
@@ -372,7 +412,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
         </div>
 
         <div class="form-group" style="display:flex; align-items:center; gap:10px;">
-            <input type="checkbox" name="disponibile" id="disponibile" value="1" checked>
+            <input type="checkbox" name="disponibile" id="disponibile" value="1" checked style="width:auto;">
             <label for="disponibile" style="margin:0;"><?php echo $t['disponibile_subito']; ?></label>
         </div>
         <button type="submit"><?php echo $t['aggiungi_menu']; ?></button>
@@ -400,6 +440,8 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                 $allergeni_selezionati[] = $ra['allergene_id'];
             }
             $ha_allergeni_salvati = count($allergeni_selezionati) > 0 || !empty($piatto['note_allergeni']);
+
+            $ha_traduzione_nome = get_traduzione($conn, 'piatti', $piatto['id'], 'nome', 'en') !== null;
         ?>
 
         <?php if ($piatto['nome_categoria'] !== $categoria_corrente): ?>
@@ -435,7 +477,6 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                     </div>
                 </div>
 
-                <!-- Form di modifica inline -->
                 <div class="form-modifica" id="edit-<?php echo $piatto['id']; ?>">
                     <form action="admin_v2.php" method="POST">
                         <input type="hidden" name="azione_piatto" value="modifica">
@@ -457,12 +498,16 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                             <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
                         </div>
 
+                        <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                            <input type="checkbox" name="traduci_nome" value="1" style="width:auto;" <?php echo $ha_traduzione_nome ? 'checked' : ''; ?>>
+                            <label style="margin:0;"><?php echo $t['traduci_nome'] ?? 'Traduci il nome automaticamente'; ?></label>
+                        </div>
+
                         <div class="form-group">
                             <label><?php echo $t['descrizione_label']; ?></label>
                             <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
                         </div>
 
-                        <!-- Toggle allergeni: aperto se ha già allergeni, chiuso se no -->
                         <div class="form-group">
                             <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
                                 <input type="checkbox"
@@ -481,7 +526,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                                     <label class="allergene-checkbox">
                                         <input type="checkbox" name="allergeni[]" value="<?php echo $allergene['id']; ?>"
                                             <?php echo in_array($allergene['id'], $allergeni_selezionati) ? 'checked' : ''; ?>>
-                                        <?php echo htmlspecialchars($allergene['nome']); ?>
+                                        <?php echo htmlspecialchars($t[$allergene['chiave']] ?? $allergene['nome']); ?>
                                     </label>
                                 <?php endforeach; ?>
                             </div>
@@ -495,7 +540,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                         </div>
 
                         <div class="form-group" style="display:flex; align-items:center; gap:10px;">
-                            <input type="checkbox" name="disponibile" value="1" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
+                            <input type="checkbox" name="disponibile" value="1" style="width:auto;" <?php echo ($piatto['disponibile'] == 1) ? 'checked' : ''; ?>>
                             <label style="margin:0;"><?php echo $t['disponibile_label']; ?></label>
                         </div>
 

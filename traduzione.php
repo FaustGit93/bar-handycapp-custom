@@ -41,7 +41,10 @@ function salva_traduzione($conn, $tabella, $riga_id, $campo, $lingua, $testo, $v
         VALUES (?, ?, ?, ?, ?, ?)
         ON DUPLICATE KEY UPDATE testo = VALUES(testo), verificata = VALUES(verificata), updated_at = NOW()
     ");
-    $stmt->bind_param("siissi", $tabella, $riga_id, $campo, $lingua, $testo, $verificata);
+
+    $stmt->bind_param("sisssi", $tabella, $riga_id, $campo, $lingua, $testo, $verificata);
+
+  
     $stmt->execute();
     $stmt->close();
 }

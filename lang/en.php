@@ -74,4 +74,22 @@ $t = [
     'piatto_errore_agg'         => '❌ Error during update.',
     'piatto_eliminato'          => '🗑️ Item deleted successfully!',
     'piatto_errore_el'          => '❌ Error during deletion.',
+
+// Allergens
+'all_glutine'    => 'Gluten',
+'all_crostacei'  => 'Crustaceans',
+'all_uova'       => 'Eggs',
+'all_pesce'      => 'Fish',
+'all_arachidi'   => 'Peanuts',
+'all_soia'       => 'Soy',
+'all_latte'      => 'Milk',
+'all_frutta_guscio' => 'Tree nuts',
+'all_sedano'     => 'Celery',
+'all_senape'     => 'Mustard',
+'all_sesamo'     => 'Sesame',
+'all_solfiti'    => 'Sulphur dioxide and sulphites',
+'all_lupini'     => 'Lupin',
+'all_molluschi'  => 'Molluscs',
+    
+
 ];

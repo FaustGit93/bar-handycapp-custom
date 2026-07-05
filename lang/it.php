@@ -73,4 +73,22 @@ $t = [
     'piatto_errore_agg'         => '❌ Errore durante l\'aggiornamento.',
     'piatto_eliminato'          => '🗑️ Piatto eliminato con successo!',
     'piatto_errore_el'          => '❌ Errore durante l\'eliminazione.',
+
+
+    // Allergeni
+'all_glutine'    => 'Glutine',
+'all_crostacei'  => 'Crostacei',
+'all_uova'       => 'Uova',
+'all_pesce'      => 'Pesce',
+'all_arachidi'   => 'Arachidi',
+'all_soia'       => 'Soia',
+'all_latte'      => 'Latte',
+'all_frutta_guscio' => 'Frutta a guscio',
+'all_sedano'     => 'Sedano',
+'all_senape'     => 'Senape',
+'all_sesamo'     => 'Sesamo',
+'all_solfiti'    => 'Anidride solforosa e solfiti',
+'all_lupini'     => 'Lupini',
+'all_molluschi'  => 'Molluschi',
+
 ];

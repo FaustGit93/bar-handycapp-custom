@@ -74,4 +74,20 @@ $t = [
     'piatto_errore_agg'         => '❌ Erro durante a atualização.',
     'piatto_eliminato'          => '🗑️ Item excluído com sucesso!',
     'piatto_errore_el'          => '❌ Erro durante a exclusão.',
+
+    // Alérgenos
+'all_glutine'    => 'Glúten',
+'all_crostacei'  => 'Crustáceos',
+'all_uova'       => 'Ovos',
+'all_pesce'      => 'Peixe',
+'all_arachidi'   => 'Amendoim',
+'all_soia'       => 'Soja',
+'all_latte'      => 'Leite',
+'all_frutta_guscio' => 'Frutos de casca rija',
+'all_sedano'     => 'Aipo',
+'all_senape'     => 'Mostarda',
+'all_sesamo'     => 'Gergelim',
+'all_solfiti'    => 'Dióxido de enxofre e sulfitos',
+'all_lupini'     => 'Tremoço',
+'all_molluschi'  => 'Moluscos',
 ];
