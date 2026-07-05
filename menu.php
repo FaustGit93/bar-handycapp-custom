@@ -53,26 +53,6 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         }
         $categorie_query->data_seek(0);
         ?>
-
-        <!-- Selettore lingua -->
-        <div class="lang-switcher-menu">
-            <input type="checkbox" id="lang-toggle-menu" class="lang-toggle-input">
-            <label for="lang-toggle-menu" class="lang-selected-menu">
-                <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="20" height="15">
-                <span class="lang-arrow">▾</span>
-            </label>
-            <div class="lang-options-menu">
-                <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
-                    <img src="https://flagcdn.com/w40/it.png" width="20" height="15"> IT
-                </a>
-                <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
-                    <img src="https://flagcdn.com/w40/gb.png" width="20" height="15"> EN
-                </a>
-                <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
-                    <img src="https://flagcdn.com/w40/br.png" width="20" height="15"> PT
-                </a>
-            </div>
-        </div>
     </nav>
 
     <div class="menu-container">
@@ -139,6 +119,25 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
             }
         }
         ?>
+    </div>
+
+    <!-- Selettore lingua floating -->
+    <div class="lang-fab">
+        <input type="checkbox" id="lang-toggle-menu" class="lang-toggle-input">
+        <label for="lang-toggle-menu" class="lang-selected-menu">
+            <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
+        </label>
+        <div class="lang-options-menu">
+            <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
+                <img src="https://flagcdn.com/w40/it.png" width="20" height="15"> IT
+            </a>
+            <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
+                <img src="https://flagcdn.com/w40/gb.png" width="20" height="15"> EN
+            </a>
+            <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
+                <img src="https://flagcdn.com/w40/br.png" width="20" height="15"> PT
+            </a>
+        </div>
     </div>
 
 </body>
