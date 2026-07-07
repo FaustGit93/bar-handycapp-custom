@@ -143,3 +143,58 @@ th { background-color: #f8f9fa; }
 .lang-options a:hover { background: #f8f9fa; color: #333; }
 .lang-options a.attiva { font-weight: bold; color: #111; background: #f0f0f0; }
 .lang-options a img, .lang-selected img { width: 24px; height: 18px; object-fit: cover; border-radius: 2px; }
+
+/* ── Pulsante traduzioni ── */
+.btn-traduzioni-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+    color: #1565c0;
+    text-decoration: none;
+    font-size: 18px;
+    transition: background-color .15s;
+}
+.btn-traduzioni-icon:hover { background-color: #bbdefb; }
+
+/* ── Selettore lingua nel pannello traduzioni ── */
+.trad-lang-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.trad-lang-radio { display: none !important; }
+
+.trad-lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.trad-lang-radio:checked + .trad-lang-btn {
+    background:  #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.trad-lang-btn img {
+    width: 20px;
+    height: 15px;
+    object-fit: cover;
+    border-radius: 2px;
+}
+
+
+

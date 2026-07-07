@@ -109,3 +109,26 @@ function traduci_e_salva_tutto($conn, $tabella, $riga_id, $campo, $testo) {
         }
     }
 }
+
+/**
+ * Recupera tutte le traduzioni di una riga (piatto o categoria) 
+ * organizzate per lingua e campo
+ * 
+ * @param mysqli $conn
+ * @param string $tabella
+ * @param int    $riga_id
+ * @return array Esempio: ['en' => ['nome' => '...', 'descrizione' => '...'], 'pt' => [...]]
+ */
+function get_tutte_traduzioni($conn, $tabella, $riga_id) {
+    $stmt = $conn->prepare("SELECT campo, lingua, testo FROM traduzioni WHERE tabella = ? AND riga_id = ?");
+    $stmt->bind_param("si", $tabella, $riga_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $traduzioni = [];
+    while ($row = $result->fetch_assoc()) {
+        $traduzioni[$row['lingua']][$row['campo']] = $row['testo'];
+    }
+    $stmt->close();
+    return $traduzioni;
+}

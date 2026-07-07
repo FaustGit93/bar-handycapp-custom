@@ -152,6 +152,38 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'switch_Stato' && isset($_GET['
     exit();
 }
 
+// --- LOGICA PIATTI: SALVA TRADUZIONE MANUALE ---
+if (isset($_POST['azione_traduzione']) && $_POST['azione_traduzione'] == 'salva_piatto') {
+    $id_piatto_trad = intval($_POST['id_piatto_trad']);
+    $lingua_trad = $_POST['lingua_trad'];
+    $nome_trad = trim($_POST['nome_trad']);
+    $descrizione_trad = trim($_POST['descrizione_trad']);
+
+    if (in_array($lingua_trad, LINGUE_SUPPORTATE) && $lingua_trad !== LINGUA_BASE) {
+        if (!empty($nome_trad)) {
+            salva_traduzione($conn, 'piatti', $id_piatto_trad, 'nome', $lingua_trad, $nome_trad, 1);
+        }
+        if (!empty($descrizione_trad)) {
+            salva_traduzione($conn, 'piatti', $id_piatto_trad, 'descrizione', $lingua_trad, $descrizione_trad, 1);
+        }
+        $messaggio = "<div class='alert success'>✅ " . ($t['traduzione_salvata'] ?? 'Traduzione salvata!') . "</div>";
+    }
+}
+
+// --- LOGICA CATEGORIE: SALVA TRADUZIONE MANUALE ---
+if (isset($_POST['azione_traduzione']) && $_POST['azione_traduzione'] == 'salva_categoria') {
+    $id_cat_trad = intval($_POST['id_cat_trad']);
+    $lingua_trad = $_POST['lingua_trad'];
+    $nome_trad = trim($_POST['nome_trad']);
+
+    if (in_array($lingua_trad, LINGUE_SUPPORTATE) && $lingua_trad !== LINGUA_BASE) {
+        if (!empty($nome_trad)) {
+            salva_traduzione($conn, 'categorie', $id_cat_trad, 'nome', $lingua_trad, $nome_trad, 1);
+        }
+        $messaggio_cat = "<div class='alert success'>✅ " . ($t['traduzione_salvata'] ?? 'Traduzione salvata!') . "</div>";
+    }
+}
+
 // --- LOGICA PIATTI: MODIFICA ---
 if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
     $id_piatto = intval($_POST['id_piatto']);
@@ -202,7 +234,7 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
 }
 
 // --- LOGICA PIATTI: INSERIMENTO ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !isset($_POST['azione_piatto'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !isset($_POST['azione_piatto']) && !isset($_POST['azione_traduzione'])) {
     $categoria_id = intval($_POST['categoria_id']);
     $nome = trim($_POST['nome']);
     $descrizione = trim($_POST['descrizione']);
@@ -255,6 +287,8 @@ while ($a = $lista_allergeni->fetch_assoc()) {
     $tutti_allergeni[] = $a;
 }
 $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p JOIN categorie c ON p.categoria_id = c.id ORDER BY c.ordine ASC, p.nome ASC");
+
+$lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
 ?>
 
 <!DOCTYPE html>
@@ -314,17 +348,16 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <table>
         <thead>
             <tr>
-                <th><?php echo $t['col_ordine']; ?></th>
                 <th><?php echo $t['col_nome']; ?></th>
                 <th style="text-align:center;"><?php echo $t['col_sposta']; ?></th>
                 <th style="text-align:center;"><?php echo $t['col_visibilita']; ?></th>
+                <th style="text-align:center;">🌐</th>
                 <th><?php echo $t['col_azioni']; ?></th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($tutte_categorie as $i => $cat): ?>
             <tr>
-                <td><?php echo $i + 1; ?></td>
                 <td><strong><?php echo htmlspecialchars($cat['nome']); ?></strong></td>
                 <td style="text-align:center;">
                     <?php if ($i > 0): ?>
@@ -345,13 +378,54 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                         <a href="admin_v2.php?azione=switch_visibilita_cat&id=<?php echo $cat['id']; ?>&stato=1" title="<?php echo $t['title_nascosta']; ?>" style="opacity:0.4; text-decoration:none;">🚫</a>
                     <?php endif; ?>
                 </td>
+                <td style="text-align:center;">
+                    <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
+                       onclick="document.getElementById('trad-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
+                </td>
                 <td>
                     <a href="admin_v2.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina" onclick="return confirm('<?php echo $t['confirm_elimina_cat']; ?>');"><?php echo $t['elimina']; ?></a>
                 </td>
             </tr>
+            <tr>
+                <td colspan="6" style="padding:0; border:0;">
+                    <div class="form-modifica" id="trad-cat-<?php echo $cat['id']; ?>" style="margin:0;">
+                        <?php
+                        $traduzioni_cat = get_tutte_traduzioni($conn, 'categorie', $cat['id']);
+                        ?>
+                        <div class="trad-lang-selector">
+                            <?php foreach ($lingue_da_tradurre as $idx => $lng): ?>
+                                <input type="radio" name="trad_lang_select_cat_<?php echo $cat['id']; ?>"
+                                       id="trad_lang_cat_<?php echo $cat['id']; ?>_<?php echo $lng; ?>"
+                                       class="trad-lang-radio"
+                                       onclick="mostraTraduzioneCat(<?php echo $cat['id']; ?>, '<?php echo $lng; ?>')"
+                                       <?php echo $idx === 0 ? 'checked' : ''; ?>>
+                                <label for="trad_lang_cat_<?php echo $cat['id']; ?>_<?php echo $lng; ?>" class="trad-lang-btn">
+                                    <img src="https://flagcdn.com/w40/<?php echo $lng === 'pt' ? 'br' : ($lng === 'en' ? 'gb' : $lng); ?>.png" width="20" height="15">
+                                    <?php echo strtoupper($lng); ?>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <?php foreach ($lingue_da_tradurre as $idx => $lng): ?>
+                            <form action="admin_v2.php" method="POST" class="trad-form" id="trad-form-cat-<?php echo $cat['id']; ?>-<?php echo $lng; ?>"
+                                  style="<?php echo $idx === 0 ? '' : 'display:none;'; ?>">
+                                <input type="hidden" name="azione_traduzione" value="salva_categoria">
+                                <input type="hidden" name="id_cat_trad" value="<?php echo $cat['id']; ?>">
+                                <input type="hidden" name="lingua_trad" value="<?php echo $lng; ?>">
+
+                                <div class="form-group">
+                                    <label>Nome (<?php echo strtoupper($lng); ?>)</label>
+                                    <input type="text" name="nome_trad" value="<?php echo htmlspecialchars($traduzioni_cat[$lng]['nome'] ?? ''); ?>">
+                                </div>
+                                <button type="submit">Salva traduzione</button>
+                            </form>
+                        <?php endforeach; ?>
+                    </div>
+                </td>
+            </tr>
             <?php endforeach; ?>
             <?php if ($totale_cat === 0): ?>
-                <tr><td colspan="5" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
+                <tr><td colspan="6" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -442,6 +516,7 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
             $ha_allergeni_salvati = count($allergeni_selezionati) > 0 || !empty($piatto['note_allergeni']);
 
             $ha_traduzione_nome = get_traduzione($conn, 'piatti', $piatto['id'], 'nome', 'en') !== null;
+            $traduzioni_piatto = get_tutte_traduzioni($conn, 'piatti', $piatto['id']);
         ?>
 
         <?php if ($piatto['nome_categoria'] !== $categoria_corrente): ?>
@@ -469,6 +544,9 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
 
                         <a href="#" class="btn-modifica-icon" title="<?php echo $t['title_modifica']; ?>"
                            onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
+
+                        <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
+                           onclick="document.getElementById('trad-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
 
                         <a href="admin_v2.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
                            class="btn-elimina-icon"
@@ -547,6 +625,42 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
                         <button type="submit"><?php echo $t['salva_modifiche']; ?></button>
                     </form>
                 </div>
+
+                <!-- Pannello traduzioni -->
+                <div class="form-modifica" id="trad-<?php echo $piatto['id']; ?>">
+                    <div class="trad-lang-selector">
+                        <?php foreach ($lingue_da_tradurre as $idx => $lng): ?>
+                            <input type="radio" name="trad_lang_select_<?php echo $piatto['id']; ?>"
+                                   id="trad_lang_<?php echo $piatto['id']; ?>_<?php echo $lng; ?>"
+                                   class="trad-lang-radio"
+                                   onclick="mostraTraduzione(<?php echo $piatto['id']; ?>, '<?php echo $lng; ?>')"
+                                   <?php echo $idx === 0 ? 'checked' : ''; ?>>
+                            <label for="trad_lang_<?php echo $piatto['id']; ?>_<?php echo $lng; ?>" class="trad-lang-btn">
+                                <img src="https://flagcdn.com/w40/<?php echo $lng === 'pt' ? 'br' : ($lng === 'en' ? 'gb' : $lng); ?>.png" width="20" height="15">
+                                <?php echo strtoupper($lng); ?>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <?php foreach ($lingue_da_tradurre as $idx => $lng): ?>
+                        <form action="admin_v2.php" method="POST" class="trad-form" id="trad-form-<?php echo $piatto['id']; ?>-<?php echo $lng; ?>"
+                              style="<?php echo $idx === 0 ? '' : 'display:none;'; ?>">
+                            <input type="hidden" name="azione_traduzione" value="salva_piatto">
+                            <input type="hidden" name="id_piatto_trad" value="<?php echo $piatto['id']; ?>">
+                            <input type="hidden" name="lingua_trad" value="<?php echo $lng; ?>">
+
+                            <div class="form-group">
+                                <label>Nome (<?php echo strtoupper($lng); ?>)</label>
+                                <input type="text" name="nome_trad" value="<?php echo htmlspecialchars($traduzioni_piatto[$lng]['nome'] ?? ''); ?>">
+                            </div>
+                            <div class="form-group">
+                                <label>Descrizione (<?php echo strtoupper($lng); ?>)</label>
+                                <textarea name="descrizione_trad" rows="2"><?php echo htmlspecialchars($traduzioni_piatto[$lng]['descrizione'] ?? ''); ?></textarea>
+                            </div>
+                            <button type="submit">Salva traduzione</button>
+                        </form>
+                    <?php endforeach; ?>
+                </div>
             </div>
 
         <?php endwhile; ?>
@@ -556,6 +670,22 @@ $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p
     <?php endif; ?>
 
 </div>
+
+<script>
+function mostraTraduzione(idPiatto, lingua) {
+    var forms = document.querySelectorAll('[id^="trad-form-' + idPiatto + '-"]');
+    forms.forEach(function(f) { f.style.display = 'none'; });
+    var target = document.getElementById('trad-form-' + idPiatto + '-' + lingua);
+    if (target) target.style.display = 'block';
+}
+
+function mostraTraduzioneCat(idCat, lingua) {
+    var forms = document.querySelectorAll('[id^="trad-form-cat-' + idCat + '-"]');
+    forms.forEach(function(f) { f.style.display = 'none'; });
+    var target = document.getElementById('trad-form-cat-' + idCat + '-' + lingua);
+    if (target) target.style.display = 'block';
+}
+</script>
 
 </body>
 </html>
