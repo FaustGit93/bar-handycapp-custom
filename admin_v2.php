@@ -387,8 +387,9 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
                 </td>
             </tr>
             <tr>
-                <td colspan="6" style="padding:0; border:0;">
+                <td colspan="5" class="trad-cell-wrapper">
                     <div class="form-modifica" id="trad-cat-<?php echo $cat['id']; ?>" style="margin:0;">
+                        <div class="trad-content">
                         <?php
                         $traduzioni_cat = get_tutte_traduzioni($conn, 'categorie', $cat['id']);
                         ?>
@@ -420,12 +421,13 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
                                 <button type="submit">Salva traduzione</button>
                             </form>
                         <?php endforeach; ?>
+                        </div>
                     </div>
                 </td>
             </tr>
             <?php endforeach; ?>
             <?php if ($totale_cat === 0): ?>
-                <tr><td colspan="6" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
+                <tr><td colspan="5" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -628,6 +630,7 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
 
                 <!-- Pannello traduzioni -->
                 <div class="form-modifica" id="trad-<?php echo $piatto['id']; ?>">
+                    <div class="trad-content">
                     <div class="trad-lang-selector">
                         <?php foreach ($lingue_da_tradurre as $idx => $lng): ?>
                             <input type="radio" name="trad_lang_select_<?php echo $piatto['id']; ?>"
@@ -660,6 +663,7 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
                             <button type="submit">Salva traduzione</button>
                         </form>
                     <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
 

@@ -168,6 +168,10 @@ th { background-color: #f8f9fa; }
     margin-bottom: 15px;
 }
 
+.trad-content {
+    min-height: 0;
+}
+
 .trad-lang-radio { display: none !important; }
 
 .trad-lang-btn {
