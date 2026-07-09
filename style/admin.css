@@ -49,10 +49,21 @@ button.btn-verde:hover { background-color: #1e7e34; }
 .form-inline button { width: auto; padding: 8px 20px; }
 hr { margin: 40px 0; border: 0; border-top: 1px solid #eee; }
 
+
+
+
 /* ── Tabella categorie ── */
-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
-th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-th { background-color: #f8f9fa; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 13px; }
+th, td { border: 1px solid #ddd; padding: 6px 8px; text-align: left; }
+
+
+table .btn-elimina-icon,
+table .btn-traduzioni-icon {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+}
+
 .btn-elimina { color: #dc3545; text-decoration: none; font-weight: bold; }
 .btn-elimina:hover { text-decoration: underline; }
 .btn-freccia { text-decoration: none; font-size: 16px; padding: 0 3px; }

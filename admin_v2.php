@@ -390,9 +390,9 @@ $etichette_lingue = [
                     <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
                        onclick="document.getElementById('trad-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
                 </td>
-                <td>
-                    <a href="admin_v2.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina" onclick="return confirm('<?php echo $t['confirm_elimina_cat']; ?>');"><?php echo $t['elimina']; ?></a>
-                </td>
+              <td style="text-align:center;">
+    <a href="admin_v2.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina-icon" title="<?php echo $t['elimina']; ?>" onclick="return confirm('<?php echo $t['confirm_elimina_cat']; ?>');">🗑️</a>
+</td>
             </tr>
             <tr>
                 <td colspan="5" class="trad-cell-wrapper">
