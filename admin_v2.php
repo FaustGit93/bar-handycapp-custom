@@ -194,43 +194,81 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
     $prezzo = floatval($_POST['prezzo']);
     $disponibile = isset($_POST['disponibile']) ? 1 : 0;
     $traduci_nome = isset($_POST['traduci_nome']) ? 1 : 0;
+    $lang_modifica = $_POST['lang_modifica'] ?? LINGUA_BASE;
 
-    $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, nome = ?, descrizione = ?, note_allergeni = ?, prezzo = ?, disponibile = ? WHERE id = ?");
-    $stmt->bind_param("isssdii", $categoria_id, $nome, $descrizione, $note_allergeni, $prezzo, $disponibile, $id_piatto);
+    if ($lang_modifica === LINGUA_BASE) {
+        // --- Modifica sulla lingua base: comportamento originale ---
+        $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, nome = ?, descrizione = ?, note_allergeni = ?, prezzo = ?, disponibile = ? WHERE id = ?");
+        $stmt->bind_param("isssdii", $categoria_id, $nome, $descrizione, $note_allergeni, $prezzo, $disponibile, $id_piatto);
 
-    if ($stmt->execute()) {
-        $stmt_del = $conn->prepare("DELETE FROM piatti_allergeni WHERE piatto_id = ?");
-        $stmt_del->bind_param("i", $id_piatto);
-        $stmt_del->execute();
-        $stmt_del->close();
+        if ($stmt->execute()) {
+            $stmt_del = $conn->prepare("DELETE FROM piatti_allergeni WHERE piatto_id = ?");
+            $stmt_del->bind_param("i", $id_piatto);
+            $stmt_del->execute();
+            $stmt_del->close();
 
-        if (isset($_POST['allergeni']) && is_array($_POST['allergeni'])) {
-            $stmt_all = $conn->prepare("INSERT INTO piatti_allergeni (piatto_id, allergene_id) VALUES (?, ?)");
-            foreach ($_POST['allergeni'] as $id_allergene) {
-                $id_allergene = intval($id_allergene);
-                $stmt_all->bind_param("ii", $id_piatto, $id_allergene);
-                $stmt_all->execute();
+            if (isset($_POST['allergeni']) && is_array($_POST['allergeni'])) {
+                $stmt_all = $conn->prepare("INSERT INTO piatti_allergeni (piatto_id, allergene_id) VALUES (?, ?)");
+                foreach ($_POST['allergeni'] as $id_allergene) {
+                    $id_allergene = intval($id_allergene);
+                    $stmt_all->bind_param("ii", $id_piatto, $id_allergene);
+                    $stmt_all->execute();
+                }
+                $stmt_all->close();
             }
-            $stmt_all->close();
-        }
 
-        if ($traduci_nome) {
-            traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'nome', $nome);
+            if ($traduci_nome) {
+                traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'nome', $nome);
+            } else {
+                $stmt_del_tr = $conn->prepare("DELETE FROM traduzioni WHERE tabella = 'piatti' AND riga_id = ? AND campo = 'nome'");
+                $stmt_del_tr->bind_param("i", $id_piatto);
+                $stmt_del_tr->execute();
+                $stmt_del_tr->close();
+            }
+            if (!empty($descrizione)) {
+                traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'descrizione', $descrizione);
+            }
+
+            $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>";
         } else {
-            $stmt_del_tr = $conn->prepare("DELETE FROM traduzioni WHERE tabella = 'piatti' AND riga_id = ? AND campo = 'nome'");
-            $stmt_del_tr->bind_param("i", $id_piatto);
-            $stmt_del_tr->execute();
-            $stmt_del_tr->close();
+            $messaggio = "<div class='alert error'>" . $t['piatto_errore_agg'] . "</div>";
         }
-        if (!empty($descrizione)) {
-            traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'descrizione', $descrizione);
-        }
+        $stmt->close();
 
-        $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>";
     } else {
-        $messaggio = "<div class='alert error'>" . $t['piatto_errore_agg'] . "</div>";
+        // --- Modifica su una lingua tradotta: aggiorna solo la traduzione di nome/descrizione ---
+        $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, note_allergeni = ?, prezzo = ?, disponibile = ? WHERE id = ?");
+        $stmt->bind_param("isdii", $categoria_id, $note_allergeni, $prezzo, $disponibile, $id_piatto);
+
+        if ($stmt->execute()) {
+            $stmt_del = $conn->prepare("DELETE FROM piatti_allergeni WHERE piatto_id = ?");
+            $stmt_del->bind_param("i", $id_piatto);
+            $stmt_del->execute();
+            $stmt_del->close();
+
+            if (isset($_POST['allergeni']) && is_array($_POST['allergeni'])) {
+                $stmt_all = $conn->prepare("INSERT INTO piatti_allergeni (piatto_id, allergene_id) VALUES (?, ?)");
+                foreach ($_POST['allergeni'] as $id_allergene) {
+                    $id_allergene = intval($id_allergene);
+                    $stmt_all->bind_param("ii", $id_piatto, $id_allergene);
+                    $stmt_all->execute();
+                }
+                $stmt_all->close();
+            }
+
+            if (!empty($nome)) {
+                salva_traduzione($conn, 'piatti', $id_piatto, 'nome', $lang_modifica, $nome, 1);
+            }
+            if (!empty($descrizione)) {
+                salva_traduzione($conn, 'piatti', $id_piatto, 'descrizione', $lang_modifica, $descrizione, 1);
+            }
+
+            $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>";
+        } else {
+            $messaggio = "<div class='alert error'>" . $t['piatto_errore_agg'] . "</div>";
+        }
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 // --- LOGICA PIATTI: INSERIMENTO ---
@@ -359,7 +397,6 @@ $etichette_lingue = [
                 <th><?php echo $t['col_nome']; ?></th>
                 <th style="text-align:center;"><?php echo $t['col_sposta']; ?></th>
                 <th style="text-align:center;">👁️</th>
-
                 <th style="text-align:center;">🌐</th>
                 <th><?php echo $t['col_azioni']; ?></th>
             </tr>
@@ -391,9 +428,11 @@ $etichette_lingue = [
                     <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
                        onclick="document.getElementById('trad-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
                 </td>
-              <td style="text-align:center;">
+               
+                <td style="text-align:center;">
     <a href="admin_v2.php?azione=elimina_cat&id=<?php echo $cat['id']; ?>" class="btn-elimina-icon" title="<?php echo $t['elimina']; ?>" onclick="return confirm('<?php echo $t['confirm_elimina_cat']; ?>');">🗑️</a>
 </td>
+
             </tr>
             <tr>
                 <td colspan="5" class="trad-cell-wrapper">
@@ -575,6 +614,7 @@ $etichette_lingue = [
                     <form action="admin_v2.php" method="POST">
                         <input type="hidden" name="azione_piatto" value="modifica">
                         <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
+                        <input type="hidden" name="lang_modifica" value="<?php echo $lang; ?>">
 
                         <div class="form-group">
                             <label><?php echo $t['categoria_label']; ?></label>
@@ -589,7 +629,7 @@ $etichette_lingue = [
 
                         <div class="form-group">
                             <label><?php echo $t['nome_label']; ?></label>
-                            <input type="text" name="nome" required value="<?php echo htmlspecialchars($piatto['nome']); ?>">
+                            <input type="text" name="nome" required value="<?php echo htmlspecialchars($nome_visualizzato); ?>">
                         </div>
 
                         <div class="form-group" style="display:flex; align-items:center; gap:10px;">
@@ -599,7 +639,7 @@ $etichette_lingue = [
 
                         <div class="form-group">
                             <label><?php echo $t['descrizione_label']; ?></label>
-                            <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($piatto['descrizione']); ?></textarea>
+                            <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($desc_visualizzata); ?></textarea>
                         </div>
 
                         <div class="form-group">
