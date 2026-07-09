@@ -358,7 +358,8 @@ $etichette_lingue = [
             <tr>
                 <th><?php echo $t['col_nome']; ?></th>
                 <th style="text-align:center;"><?php echo $t['col_sposta']; ?></th>
-                <th style="text-align:center;"><?php echo $t['col_visibilita']; ?></th>
+                <th style="text-align:center;">👁️</th>
+
                 <th style="text-align:center;">🌐</th>
                 <th><?php echo $t['col_azioni']; ?></th>
             </tr>
