@@ -289,6 +289,13 @@ while ($a = $lista_allergeni->fetch_assoc()) {
 $piatti_query = $conn->query("SELECT p.*, c.nome AS nome_categoria FROM piatti p JOIN categorie c ON p.categoria_id = c.id ORDER BY c.ordine ASC, p.nome ASC");
 
 $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
+
+// Etichette "Nome"/"Descrizione" nella lingua di destinazione della traduzione
+$etichette_lingue = [
+    'it' => ['nome' => 'Nome', 'descrizione' => 'Descrizione'],
+    'en' => ['nome' => 'Name', 'descrizione' => 'Description'],
+    'pt' => ['nome' => 'Nome', 'descrizione' => 'Descrição'],
+];
 ?>
 
 <!DOCTYPE html>
@@ -345,6 +352,7 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
         </div>
     </form>
 
+    <div class="table-scroll">
     <table>
         <thead>
             <tr>
@@ -358,7 +366,7 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
         <tbody>
             <?php foreach ($tutte_categorie as $i => $cat): ?>
             <tr>
-                <td><strong><?php echo htmlspecialchars($cat['nome']); ?></strong></td>
+                <td><strong><?php echo htmlspecialchars(get_traduzione($conn, 'categorie', $cat['id'], 'nome', $lang) ?? $cat['nome']); ?></strong></td>
                 <td style="text-align:center;">
                     <?php if ($i > 0): ?>
                         <a href="admin_v2.php?azione=cat_su&id=<?php echo $cat['id']; ?>" class="btn-freccia">▲</a>
@@ -415,7 +423,7 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
                                 <input type="hidden" name="lingua_trad" value="<?php echo $lng; ?>">
 
                                 <div class="form-group">
-                                    <label>Nome (<?php echo strtoupper($lng); ?>)</label>
+                                    <label><?php echo $etichette_lingue[$lng]['nome']; ?> (<?php echo strtoupper($lng); ?>)</label>
                                     <input type="text" name="nome_trad" value="<?php echo htmlspecialchars($traduzioni_cat[$lng]['nome'] ?? ''); ?>">
                                 </div>
                                 <button type="submit">Salva traduzione</button>
@@ -431,6 +439,7 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
             <?php endif; ?>
         </tbody>
     </table>
+    </div>
 
     <hr>
 
@@ -529,9 +538,13 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
             <div class="piatto-card">
                 <div class="piatto-row">
                     <div class="piatto-info">
-                        <div class="nome"><?php echo htmlspecialchars($piatto['nome']); ?></div>
-                        <?php if (!empty($piatto['descrizione'])): ?>
-                            <div class="descrizione"><?php echo htmlspecialchars($piatto['descrizione']); ?></div>
+                        <?php
+                        $nome_visualizzato = get_traduzione($conn, 'piatti', $piatto['id'], 'nome', $lang) ?? $piatto['nome'];
+                        $desc_visualizzata = get_traduzione($conn, 'piatti', $piatto['id'], 'descrizione', $lang) ?? $piatto['descrizione'];
+                        ?>
+                        <div class="nome"><?php echo htmlspecialchars($nome_visualizzato); ?></div>
+                        <?php if (!empty($desc_visualizzata)): ?>
+                            <div class="descrizione"><?php echo htmlspecialchars($desc_visualizzata); ?></div>
                         <?php endif; ?>
                         <div class="prezzo">€<?php echo number_format($piatto['prezzo'], 2, ',', '.'); ?></div>
                     </div>
@@ -653,11 +666,11 @@ $lingue_da_tradurre = array_values(array_diff(LINGUE_SUPPORTATE, [$lang]));
                             <input type="hidden" name="lingua_trad" value="<?php echo $lng; ?>">
 
                             <div class="form-group">
-                                <label>Nome (<?php echo strtoupper($lng); ?>)</label>
+                                <label><?php echo $etichette_lingue[$lng]['nome']; ?> (<?php echo strtoupper($lng); ?>)</label>
                                 <input type="text" name="nome_trad" value="<?php echo htmlspecialchars($traduzioni_piatto[$lng]['nome'] ?? ''); ?>">
                             </div>
                             <div class="form-group">
-                                <label>Descrizione (<?php echo strtoupper($lng); ?>)</label>
+                                <label><?php echo $etichette_lingue[$lng]['descrizione']; ?> (<?php echo strtoupper($lng); ?>)</label>
                                 <textarea name="descrizione_trad" rows="2"><?php echo htmlspecialchars($traduzioni_piatto[$lng]['descrizione'] ?? ''); ?></textarea>
                             </div>
                             <button type="submit">Salva traduzione</button>

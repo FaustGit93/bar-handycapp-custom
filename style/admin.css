@@ -200,5 +200,11 @@ th { background-color: #f8f9fa; }
     border-radius: 2px;
 }
 
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
 
 
