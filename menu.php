@@ -56,11 +56,11 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 </head>
 <body>
 
-  <div class="logo-container">
+<!----  <div class="logo-container">
         <img src="img/logo.png" alt="Logo Locale" class="logo-locale">
     </div>
 
-    
+    ---->
 
     <nav class="sticky-nav">
         <?php
