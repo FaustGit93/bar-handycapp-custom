@@ -1,97 +1,162 @@
-body { font-family: 'Segoe UI', sans-serif; background-color: #111; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-.login-box { background: #222; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 100%; max-width: 350px; text-align: center; }
-input[type="password"] { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #444; background: #333; color: #fff; border-radius: 4px; box-sizing: border-box; }
-button { background-color: #ffc107; color: #000; border: none; padding: 12px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; font-size: 16px; }
-button:hover { background-color: #e0a800; }
-.error { color: #dc3545; font-size: 14px; margin-bottom: 15px; }
+:root {
+    --bg-main: #111;
+    --bg-box: #222;
+    --text-main: #fff;
+    --text-secondary: #ccc;
+    --border-color: #444;
+    --input-bg: #333;
+    --accent: #ffc107;
+    --accent-text: #000;
+    --error-color: #dc3545;
+}
 
-/* ── Selettore lingua dropdown ── */
-.lang-switcher {
+/* Se il tema è "system" (nessun data-theme) e l'OS preferisce chiaro */
+@media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+        --bg-main: #f4f7f6;
+        --bg-box: #fff;
+        --text-main: #222;
+        --text-secondary: #555;
+        --border-color: #ddd;
+        --input-bg: #f8f9fa;
+        --accent: #ffc107;
+        --accent-text: #000;
+        --error-color: #dc3545;
+    }
+}
+
+/* Forzatura esplicita chiaro */
+html[data-theme="light"] {
+    --bg-main: #f4f7f6;
+    --bg-box: #fff;
+    --text-main: #222;
+    --text-secondary: #555;
+    --border-color: #ddd;
+    --input-bg: #f8f9fa;
+    --accent: #ffc107;
+    --accent-text: #000;
+    --error-color: #dc3545;
+}
+
+/* Forzatura esplicita scuro */
+html[data-theme="dark"] {
+    --bg-main: #111;
+    --bg-box: #222;
+    --text-main: #fff;
+    --text-secondary: #ccc;
+    --border-color: #444;
+    --input-bg: #333;
+    --accent: #ffc107;
+    --accent-text: #000;
+    --error-color: #dc3545;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-/* Nasconde il checkbox ma lo mantiene funzionante */
-.lang-toggle-input {
-    display: none;
-}
-
-.lang-selected {
-    display: flex;
     align-items: center;
-    gap: 8px;
-    background: #333;
-    border: 1px solid #555;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 6px;
+    height: 100vh;
+    margin: 0;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+.login-box {
+    background: var(--bg-box);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 350px;
+    text-align: center;
+}
+
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 15px 0;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
+    color: var(--text-main);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    background-color: var(--accent);
+    color: var(--accent-text);
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    user-select: none;
-}
-
-.lang-selected:hover {
-    background: #444;
-}
-
-.lang-arrow {
-    font-size: 11px;
-    opacity: 0.7;
-    transition: transform .2s;
-}
-
-/* Ruota la freccia quando il dropdown è aperto */
-.lang-toggle-input:checked ~ .lang-selected .lang-arrow {
-    transform: rotate(180deg);
-}
-
-.lang-options {
-    display: none;
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    border: 1px solid #555;
-    border-radius: 6px;
-    overflow: hidden;
-    min-width: 140px;
-    z-index: 100;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-
-/* Mostra il dropdown quando il checkbox è spuntato */
-.lang-toggle-input:checked ~ .lang-options {
-    display: block;
-}
-
-.lang-options a {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    color: #ccc;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.lang-options a:hover {
-    background: #444;
-    color: #fff;
-}
-
-.lang-options a.attiva {
-    color: #fff;
+    width: 100%;
     font-weight: bold;
-    background: #3a3a3a;
+    font-size: 16px;
 }
 
-.lang-options a img,
-.lang-selected img {
-    width: 24px;
-    height: 18px;
-    object-fit: cover;
-    border-radius: 2px;
+button:hover { background-color: #e0a800; }
+
+.error {
+    color: var(--error-color);
+    font-size: 14px;
+    margin-bottom: 15px;
 }
+
+/* ── Barra selettori (lingua + tema) ── */
+.top-selectors {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* ── Selettore lingua ── */
+.lang-switcher { position: relative; display: inline-block; }
+.lang-toggle-input { display: none; }
+.lang-selected {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main);
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; user-select: none;
+}
+.lang-selected:hover { opacity: 0.85; }
+.lang-arrow { font-size: 11px; opacity: 0.7; transition: transform .2s; }
+.lang-toggle-input:checked ~ .lang-selected .lang-arrow { transform: rotate(180deg); }
+.lang-options {
+    display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    background: var(--bg-box); border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden;
+    min-width: 140px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.lang-toggle-input:checked ~ .lang-options { display: block; }
+.lang-options a {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    color: var(--text-secondary); text-decoration: none; font-size: 14px;
+}
+.lang-options a:hover { background: var(--input-bg); color: var(--text-main); }
+.lang-options a.attiva { color: var(--text-main); font-weight: bold; background: var(--input-bg); }
+.lang-options a img, .lang-selected img { width: 24px; height: 18px; object-fit: cover; border-radius: 2px; }
+
+/* ── Selettore tema ── */
+.theme-switcher { position: relative; display: inline-block; }
+.theme-toggle-input { display: none; }
+.theme-selected {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-main);
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; user-select: none;
+}
+.theme-selected:hover { opacity: 0.85; }
+.theme-arrow { font-size: 11px; opacity: 0.7; transition: transform .2s; }
+.theme-toggle-input:checked ~ .theme-selected .theme-arrow { transform: rotate(180deg); }
+.theme-options {
+    display: none; position: absolute; top: calc(100% + 4px); left: 50%; transform: translateX(-50%);
+    background: var(--bg-box); border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden;
+    min-width: 140px; z-index: 100; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.theme-toggle-input:checked ~ .theme-options { display: block; }
+.theme-options a {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    color: var(--text-secondary); text-decoration: none; font-size: 14px;
+}
+.theme-options a:hover { background: var(--input-bg); color: var(--text-main); }
+.theme-options a.attiva { color: var(--text-main); font-weight: bold; background: var(--input-bg); }
