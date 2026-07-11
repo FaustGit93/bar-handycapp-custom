@@ -6,6 +6,7 @@
     --border-color: #444;
     --input-bg: #333;
     --accent: #ffc107;
+    --accent-hover: #ffca2c;
     --accent-text: #000;
     --error-color: #dc3545;
 }
@@ -20,6 +21,7 @@
         --border-color: #ddd;
         --input-bg: #f8f9fa;
         --accent: #ffc107;
+        --accent-hover: #d39e00;
         --accent-text: #000;
         --error-color: #dc3545;
     }
@@ -34,6 +36,7 @@ html[data-theme="light"] {
     --border-color: #ddd;
     --input-bg: #f8f9fa;
     --accent: #ffc107;
+    --accent-hover: #d39e00;
     --accent-text: #000;
     --error-color: #dc3545;
 }
@@ -47,6 +50,7 @@ html[data-theme="dark"] {
     --border-color: #444;
     --input-bg: #333;
     --accent: #ffc107;
+    --accent-hover: #ffca2c;
     --accent-text: #000;
     --error-color: #dc3545;
 }
@@ -96,7 +100,9 @@ button {
     font-size: 16px;
 }
 
-button:hover { background-color: #e0a800; }
+button:hover {
+    background-color: var(--accent-hover);
+}
 
 .error {
     color: var(--error-color);
