@@ -352,6 +352,19 @@ $etichette_lingue = [
         <div class="admin-topbar-left">
             <a href="logout.php" class="btn-logout"><?php echo $t['esci']; ?></a>
         </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+        <div class="theme-switcher">
+            <input type="checkbox" id="theme-toggle" class="theme-toggle-input">
+            <label for="theme-toggle" class="theme-selected">
+                <span class="theme-icon">🖥️</span>
+                <span class="theme-arrow">▾</span>
+            </label>
+            <div class="theme-options">
+                <a href="#" data-theme="light">☀️ Light</a>
+                <a href="#" data-theme="dark">🌙 Dark</a>
+                <a href="#" data-theme="system">🖥️ System</a>
+            </div>
+        </div>
         <div class="lang-switcher">
             <input type="checkbox" id="lang-toggle" class="lang-toggle-input">
             <label for="lang-toggle" class="lang-selected">
@@ -370,6 +383,7 @@ $etichette_lingue = [
                     <img src="https://flagcdn.com/w40/br.png" width="24" height="18"> Português
                 </a>
             </div>
+        </div>
         </div>
     </div>
 
@@ -744,6 +758,8 @@ function mostraTraduzioneCat(idCat, lingua) {
     if (target) target.style.display = 'block';
 }
 </script>
+
+<script src="js/theme.js"></script>
 
 </body>
 </html>

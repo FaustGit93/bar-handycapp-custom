@@ -33,4 +33,29 @@
             });
         });
     });
+
+    // Chiude i dropdown quando si clicca fuori, e chiude l'altro quando se ne apre uno
+    document.addEventListener('DOMContentLoaded', function() {
+        const langToggle = document.getElementById('lang-toggle');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        document.addEventListener('click', function(e) {
+            const clickedInsideLang = langToggle && (e.target.closest('.lang-switcher'));
+            const clickedInsideTheme = themeToggle && (e.target.closest('.theme-switcher'));
+
+            if (!clickedInsideLang && langToggle) langToggle.checked = false;
+            if (!clickedInsideTheme && themeToggle) themeToggle.checked = false;
+        });
+
+        if (langToggle) {
+            langToggle.addEventListener('change', function() {
+                if (this.checked && themeToggle) themeToggle.checked = false;
+            });
+        }
+        if (themeToggle) {
+            themeToggle.addEventListener('change', function() {
+                if (this.checked && langToggle) langToggle.checked = false;
+            });
+        }
+    });
 })();
