@@ -92,8 +92,8 @@ $t = [
 'all_molluschi'  => 'Molluschi',
 
 //Theme
-'tema_chiaro' => '☀️ Chiaro',
-'tema_scuro' => '🌙 Scuro',
+'tema_chiaro' => '☀️',
+'tema_scuro' => '🌙',
 'tema_sistema' => '🖥️',
 
 ];
