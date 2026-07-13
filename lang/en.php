@@ -90,6 +90,11 @@ $t = [
 'all_solfiti'    => 'Sulphur dioxide and sulphites',
 'all_lupini'     => 'Lupin',
 'all_molluschi'  => 'Molluscs',
+
+
+'tema_chiaro' => '☀️ Light',
+'tema_scuro' => '🌙 Dark',
+'tema_sistema' => '🖥️ System',
     
 
 ];

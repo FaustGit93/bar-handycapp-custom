@@ -90,4 +90,10 @@ $t = [
 'all_solfiti'    => 'Dióxido de enxofre e sulfitos',
 'all_lupini'     => 'Tremoço',
 'all_molluschi'  => 'Moluscos',
+
+
+'tema_chiaro'=> '☀️ Claro',
+'tema_scuro' => '🌙 Escuro',
+'tema_sistema' => '🖥️ Sistema',
+
 ];

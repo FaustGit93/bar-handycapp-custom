@@ -91,4 +91,9 @@ $t = [
 'all_lupini'     => 'Lupini',
 'all_molluschi'  => 'Molluschi',
 
+
+'tema_chiaro' => '☀️ Chiaro',
+'tema_scuro' => '🌙 Scuro',
+'tema_sistema' => '🖥️ Sistema',
+
 ];

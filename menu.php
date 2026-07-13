@@ -146,9 +146,11 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         <span class="theme-icon">🖥️</span>
     </label>
     <div class="theme-options-menu">
-        <a href="#" data-theme="light">☀️ Light</a>
-        <a href="#" data-theme="dark">🌙 Dark</a>
-       <a href="#" data-theme="system">🖥️ System</a>  
+    
+     <a href="#" data-theme="light"><?php echo $t['tema_chiaro']; ?></a>
+    <a href="#" data-theme="dark"><?php echo $t['tema_scuro']; ?></a>
+    <a href="#" data-theme="system"><?php echo $t['tema_sistema']; ?></a>
+
     </div>
 </div>
 
