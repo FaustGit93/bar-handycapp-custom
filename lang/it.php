@@ -94,6 +94,6 @@ $t = [
 //Theme
 'tema_chiaro' => '☀️ Chiaro',
 'tema_scuro' => '🌙 Scuro',
-'tema_sistema' => '🖥️ Sistema',
+'tema_sistema' => '🖥️',
 
 ];
