@@ -36,6 +36,16 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 <!DOCTYPE html>
 <html lang="<?php echo $lang; ?>">
 <head>
+
+
+<script>
+    (function() {
+        var saved = localStorage.getItem('menu_theme');
+        if (saved === 'light' || saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', saved);
+        }
+    })();
+</script>
     <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -129,7 +139,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 
 
     <!-- Selettore tema floating -->
-<!----- <div class="theme-fab">
+<div class="theme-fab">
     <input type="checkbox" id="theme-toggle-menu" class="theme-toggle-input">
     <label for="theme-toggle-menu" class="theme-selected-menu">
         <span class="theme-icon">🖥️</span>
@@ -137,33 +147,31 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
     <div class="theme-options-menu">
         <a href="#" data-theme="light">☀️ Light</a>
         <a href="#" data-theme="dark">🌙 Dark</a>
-        <a href="#" data-theme="system">🖥️ System</a>
+       <a href="#" data-theme="system">🖥️ System</a>  
     </div>
 </div>
 
------->
-
 <!-- Selettore lingua floating -->
 <div class="lang-fab">
-
-    <!-- Selettore lingua floating -->
-    <div class="lang-fab">
-        <input type="checkbox" id="lang-toggle-menu" class="lang-toggle-input">
-        <label for="lang-toggle-menu" class="lang-selected-menu">
-            <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
-        </label>
-        <div class="lang-options-menu">
-            <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
-                <img src="https://flagcdn.com/w40/it.png" width="20" height="15"> IT
-            </a>
-            <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
-                <img src="https://flagcdn.com/w40/gb.png" width="20" height="15"> EN
-            </a>
-            <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
-                <img src="https://flagcdn.com/w40/br.png" width="20" height="15"> PT
-            </a>
-        </div>
+    <input type="checkbox" id="lang-toggle-menu" class="lang-toggle-input">
+    <label for="lang-toggle-menu" class="lang-selected-menu">
+        <img src="https://flagcdn.com/w40/<?php echo $lang === 'it' ? 'it' : ($lang === 'pt' ? 'br' : 'gb'); ?>.png" width="24" height="18">
+    </label>
+    <div class="lang-options-menu">
+        <a href="?lang=it" class="<?php echo $lang === 'it' ? 'attiva' : ''; ?>">
+            <img src="https://flagcdn.com/w40/it.png" width="20" height="15"> IT
+        </a>
+        <a href="?lang=en" class="<?php echo $lang === 'en' ? 'attiva' : ''; ?>">
+            <img src="https://flagcdn.com/w40/gb.png" width="20" height="15"> EN
+        </a>
+        <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
+            <img src="https://flagcdn.com/w40/br.png" width="20" height="15"> PT
+        </a>
     </div>
+</div>
+
+<script src="js/menutheme.js"></script>
+<script src="js/menu.js"></script>
 
 
     <footer>
@@ -177,7 +185,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 
     
     <script src="js/menu.js"></script>
-     <script src="js/theme.js"></script>
+    <!--- <script src="js/theme.js"></script>  --->
 
 </body>
 </html>
