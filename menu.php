@@ -48,7 +48,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 
 <div class="sticky-header">
     <div class="menu-logo">
-        <img src="img/logo.png" alt="Logo">
+        <img src="img/Bar-Handycapp-Quartu-logo.webp" alt="Logo">
     </div>
     <nav class="sticky-nav">
         <?php
@@ -165,8 +165,19 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         </div>
     </div>
 
+
+    <footer>
+
+    <!---- To do ----->
+
+    </footer>
+    
+
+   
+
     
     <script src="js/menu.js"></script>
+     <script src="js/theme.js"></script>
 
 </body>
 </html>

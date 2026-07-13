@@ -16,7 +16,7 @@
     :root:not([data-theme]) {
         --bg-main: #f4f7f6;
         --bg-box: #fff;
-        --text-main: #222;
+        --text-main: #222222;
         --text-secondary: #555;
         --border-color: #ddd;
         --input-bg: #f8f9fa;
