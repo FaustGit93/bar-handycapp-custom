@@ -54,6 +54,8 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Menu - FYR</title>
     <link rel="stylesheet" href="style/menu.css">
+        <script src="https://kit.fontawesome.com/42a675b1a0.js" crossorigin="anonymous"></script>
+
 </head>
 <body>
 
@@ -120,7 +122,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
                         echo "  <div class='dettaglio-allergeni' id='allergeni-$id_piatto_corrente'>";
                         echo "    <div class='dettaglio-allergeni-inner'>";
                         if (count($nomi_allergeni) > 0) {
-                            echo "      <strong>Allergeni:</strong> " . htmlspecialchars(implode(', ', $nomi_allergeni));
+                           echo "      <strong>" . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . ":</strong> " . htmlspecialchars(implode(', ', $nomi_allergeni));
                         }
                         if ($ha_note) {
                             echo "      <p>" . htmlspecialchars($piatto['note_allergeni']) . "</p>";
@@ -174,7 +176,47 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 </div>
 
 
+<footer class="menu-footer">
+    <div class="menu-footer-content">
 
+       <p class="footer-dev">
+    <?php echo $t['footer_sviluppato']; ?> <strong>Fah.Visuals</strong>
+</p>
+
+       <p class="footer-piva">
+    <?php echo $t['footer_piva']; ?> 12345678
+</p>
+
+           <p class="footer-piva">
+              Cagliari, <?php echo $t['footer_location']; ?>
+        </p> 
+        <div class="footer-social">
+
+            <a href="https://www.instagram.com/fah.visuals/
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="Instagram">
+                <i class="fa-brands fa-instagram"></i>
+            </a>
+
+            <a href="https://linkedin.com/in/TUO_PROFILO"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="LinkedIn">
+                <i class="fa-brands fa-linkedin"></i>
+            </a>
+
+            <a href="https://wa.me/393775749619"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="WhatsApp">
+                <i class="fa-brands fa-whatsapp"></i>
+            </a>
+
+        </div>
+
+    </div>
+</footer>
 
 
 <script src="js/menutheme.js"></script>

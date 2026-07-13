@@ -76,6 +76,7 @@ $t = [
 
 
     // Allergeni
+'all_allergeni' => 'Allergeni',
 'all_glutine'    => 'Glutine',
 'all_crostacei'  => 'Crostacei',
 'all_uova'       => 'Uova',
@@ -95,5 +96,16 @@ $t = [
 'tema_chiaro' => '☀️',
 'tema_scuro' => '🌙',
 'tema_sistema' => '🖥️',
+
+
+//Footer dev
+'footer_sviluppato' => 'Sviluppato da',
+
+//Footer P.IVA
+'footer_piva' => 'P.IVA:',
+
+
+//Footer Location
+'footer_location' => 'Italia'
 
 ];

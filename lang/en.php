@@ -76,6 +76,7 @@ $t = [
     'piatto_errore_el'          => '❌ Error during deletion.',
 
 // Allergens
+'all_allergeni' => 'Allergens',
 'all_glutine'    => 'Gluten',
 'all_crostacei'  => 'Crustaceans',
 'all_uova'       => 'Eggs',
@@ -96,5 +97,13 @@ $t = [
 'tema_scuro' => '🌙',
 'tema_sistema' => '🖥️',
     
+//Footer dev
+'footer_sviluppato' => 'Developed by',
+
+//VAT Number
+'footer_piva' => 'VAT Number:',
+
+//Footer Location
+'footer_location' => 'Italy'
 
 ];

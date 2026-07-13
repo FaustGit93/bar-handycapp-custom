@@ -76,6 +76,7 @@ $t = [
     'piatto_errore_el'          => '❌ Erro durante a exclusão.',
 
     // Alérgenos
+'all_allergeni' => 'Alergénios',
 'all_glutine'    => 'Glúten',
 'all_crostacei'  => 'Crustáceos',
 'all_uova'       => 'Ovos',
@@ -95,5 +96,16 @@ $t = [
 'tema_chiaro'=> '☀️',
 'tema_scuro' => '🌙',
 'tema_sistema' => '🖥️',
+
+
+//Footer dev
+
+'footer_sviluppato' => 'Desenvolvido por',
+
+//Footer VAT
+'footer_piva' => 'NIF:',
+
+//Footer Location
+'footer_location' => 'Itália'
 
 ];
