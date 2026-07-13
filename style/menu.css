@@ -1,22 +1,96 @@
+:root {
+    --bg-body: #111;
+    --text-body: #fff;
+    --bg-header: #222;
+    --border-header: #333;
+    --text-nav: #ccc;
+    --text-nav-hover: #fff;
+    --accent: #ffc107;
+    --text-desc: #aaa;
+    --border-item: #333;
+    --bg-allergeni: #1a1a1a;
+    --text-allergeni: #ccc;
+    --bg-fab: #222;
+    --border-fab: #444;
+}
+
+html[data-theme="light"] {
+    --bg-body: #f4f4f4;
+    --text-body: #222;
+    --bg-header: #fff;
+    --border-header: #e0e0e0;
+    --text-nav: #555;
+    --text-nav-hover: #111;
+    --accent: #e08e00;
+    --text-desc: #666;
+    --border-item: #e0e0e0;
+    --bg-allergeni: #f0f0f0;
+    --text-allergeni: #555;
+    --bg-fab: #fff;
+    --border-fab: #ccc;
+}
+
+@media (prefers-color-scheme: light) {
+    html:not([data-theme]) {
+        --bg-body: #f4f4f4;
+        --text-body: #222;
+        --bg-header: #fff;
+        --border-header: #e0e0e0;
+        --text-nav: #555;
+        --text-nav-hover: #111;
+        --accent: #e08e00;
+        --text-desc: #666;
+        --border-item: #e0e0e0;
+        --bg-allergeni: #f0f0f0;
+        --text-allergeni: #555;
+        --bg-fab: #fff;
+        --border-fab: #ccc;
+    }
+}
+
 /* BASE MOBILE-FIRST CSS */
-body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #111; color: #fff; }
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-body); transition: background-color .2s ease, color .2s ease; }
 
-/* 1. BARRA DI NAVIGAZIONE STICKY */
-.sticky-nav { position: sticky; top: 0; background-color: #222; display: flex; overflow-x: auto; white-space: nowrap; padding: 10px; border-bottom: 1px solid #333; z-index: 999; }
+/* 1. HEADER STICKY (logo + nav insieme) */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background-color: var(--bg-header);
+}
 
-.sticky-nav a { color: #ccc; text-decoration: none; padding: 8px 16px; font-weight: bold; font-size: 14px; display: inline-block; }
-.sticky-nav a:hover { color: #fff; }
+.menu-logo {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-header);
+}
+
+.menu-logo img {
+    max-height: 50px;
+    width: auto;
+}
+
+.sticky-nav {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
+}
+
+.sticky-nav a { color: var(--text-nav); text-decoration: none; padding: 8px 16px; font-weight: bold; font-size: 14px; display: inline-block; }
+.sticky-nav a:hover { color: var(--text-nav-hover); }
 
 /* 2. STRUTTURA DEL LAYOUT DEI PIATTI */
 .menu-container { padding: 20px; max-width: 600px; margin: 0 auto; }
-.category-section { margin-bottom: 40px; scroll-margin-top: 60px; }
-.category-title { font-size: 24px; color: #ffc107; border-bottom: 2px solid #ffc107; padding-bottom: 5px; margin-bottom: 20px; }
+.category-section { margin-bottom: 40px; scroll-margin-top: 90px; }
+.category-title { font-size: 24px; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-bottom: 20px; }
 
 /* 3. IL SINGOLO PIATTO */
-.menu-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #333; }
+.menu-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-item); }
 .item-main { display: flex; justify-content: space-between; align-items: baseline; font-size: 18px; font-weight: bold; }
-.item-price { color: #ffc107; margin-left: 10px; }
-.item-description { font-size: 14px; color: #aaa; margin: 5px 0 0 0; font-weight: normal; }
+.item-price { color: var(--accent); margin-left: 10px; }
+.item-description { font-size: 14px; color: var(--text-desc); margin: 5px 0 0 0; font-weight: normal; }
 
 .icona-allergeni {
     text-decoration: none;
@@ -31,8 +105,8 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     transition: grid-template-rows .25s ease;
     overflow: hidden;
     font-size: 13px;
-    color: #ccc;
-    background: #1a1a1a;
+    color: var(--text-allergeni);
+    background: var(--bg-allergeni);
     border-radius: 4px;
 }
 
@@ -52,7 +126,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 .dettaglio-allergeni strong {
-    color: #ffc107;
+    color: var(--accent);
 }
 
 .dettaglio-allergeni p {
@@ -61,27 +135,31 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     color: #999;
 }
 
-/* ── Selettore lingua floating ── */
-.lang-fab {
+/* ── FAB comuni (lingua + tema) ── */
+.lang-fab, .theme-fab {
     position: fixed;
-    bottom: 20px;
     right: 20px;
     z-index: 1000;
 }
 
-.lang-fab input[type="checkbox"] { display: none !important; }
+.lang-fab { bottom: 20px; }
+.theme-fab { bottom: 80px; }
 
-.lang-selected-menu {
+.lang-fab input[type="checkbox"],
+.theme-fab input[type="checkbox"] { display: none !important; }
+
+.lang-selected-menu, .theme-selected-menu {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: #222;
-    border: 2px solid #444;
+    background: var(--bg-fab);
+    border: 2px solid var(--border-fab);
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    font-size: 20px;
 }
 
 .lang-selected-menu img {
@@ -91,13 +169,13 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     border-radius: 3px;
 }
 
-.lang-options-menu {
+.lang-options-menu, .theme-options-menu {
     display: none;
     position: absolute;
     bottom: calc(100% + 10px);
     right: 0;
-    background: #222;
-    border: 1px solid #444;
+    background: var(--bg-header);
+    border: 1px solid var(--border-fab);
     border-radius: 8px;
     overflow: hidden;
     min-width: 90px;
@@ -105,20 +183,18 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 .lang-fab input[type="checkbox"]:checked ~ .lang-options-menu { display: block; }
+.theme-fab input[type="checkbox"]:checked ~ .theme-options-menu { display: block; }
 
-.lang-options-menu a {
+.lang-options-menu a, .theme-options-menu a {
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 10px 12px;
-    color: #ccc;
+    color: var(--text-nav);
     text-decoration: none;
     font-size: 13px;
 }
 
-.lang-options-menu a:hover { background: #333; color: #fff; }
-.lang-options-menu a.attiva { color: #ffc107; font-weight: bold; }
+.lang-options-menu a:hover, .theme-options-menu a:hover { background: var(--border-header); color: var(--text-nav-hover); }
+.lang-options-menu a.attiva, .theme-options-menu a.attiva { color: var(--accent); font-weight: bold; }
 .lang-options-menu a img { width: 20px; height: 15px; object-fit: cover; border-radius: 2px; }
-
-
-

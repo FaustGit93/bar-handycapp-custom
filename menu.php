@@ -1,19 +1,9 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: Thu, 01 Jan 1970 00:00:00 GMT");
 header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
 include 'config.php';
 include 'connessione.php';
@@ -56,12 +46,10 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 </head>
 <body>
 
-<!----  <div class="logo-container">
-        <img src="img/logo.png" alt="Logo Locale" class="logo-locale">
+<div class="sticky-header">
+    <div class="menu-logo">
+        <img src="img/logo.png" alt="Logo">
     </div>
-
-    ---->
-
     <nav class="sticky-nav">
         <?php
         while ($cat = $categorie_query->fetch_assoc()) {
@@ -71,6 +59,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         $categorie_query->data_seek(0);
         ?>
     </nav>
+</div>
 
     <div class="menu-container">
         <?php
@@ -138,6 +127,25 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         ?>
     </div>
 
+
+    <!-- Selettore tema floating -->
+<!----- <div class="theme-fab">
+    <input type="checkbox" id="theme-toggle-menu" class="theme-toggle-input">
+    <label for="theme-toggle-menu" class="theme-selected-menu">
+        <span class="theme-icon">🖥️</span>
+    </label>
+    <div class="theme-options-menu">
+        <a href="#" data-theme="light">☀️ Light</a>
+        <a href="#" data-theme="dark">🌙 Dark</a>
+        <a href="#" data-theme="system">🖥️ System</a>
+    </div>
+</div>
+
+------>
+
+<!-- Selettore lingua floating -->
+<div class="lang-fab">
+
     <!-- Selettore lingua floating -->
     <div class="lang-fab">
         <input type="checkbox" id="lang-toggle-menu" class="lang-toggle-input">
@@ -157,6 +165,8 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         </div>
     </div>
 
+    
+    <script src="js/menu.js"></script>
 
 </body>
 </html>
