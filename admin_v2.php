@@ -338,12 +338,23 @@ $etichette_lingue = [
 
 <!DOCTYPE html>
 <html lang="<?php echo $lang; ?>">
+
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bar HandyCapp - Admin</title>
+    <script>
+        (function() {
+            var saved = localStorage.getItem('theme');
+            if (saved === 'light' || saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', saved);
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="style/admin.css">
 </head>
+
 <body>
 
 <div class="container">
