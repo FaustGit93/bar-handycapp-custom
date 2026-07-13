@@ -371,9 +371,9 @@ $etichette_lingue = [
                 <span class="theme-arrow">▾</span>
             </label>
             <div class="theme-options">
-                <a href="#" data-theme="light">☀️ Light</a>
-                <a href="#" data-theme="dark">🌙 Dark</a>
-                <a href="#" data-theme="system">🖥️ System</a>
+                               <a href="#" data-theme="light"><?php echo $t['tema_chiaro_testo']; ?></a>
+    <a href="#" data-theme="dark"><?php echo $t['tema_scuro_testo']; ?></a>
+    <a href="#" data-theme="system"><?php echo $t['tema_sistema_testo']; ?></a>
             </div>
         </div>
         <div class="lang-switcher">

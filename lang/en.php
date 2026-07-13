@@ -94,8 +94,11 @@ $t = [
 
 //Theme
 'tema_chiaro' => '☀️',
+'tema_chiaro_testo' => '☀️ Light',
 'tema_scuro' => '🌙',
+'tema_scuro_testo' => '🌙 Dark',
 'tema_sistema' => '🖥️',
+'tema_sistema_testo' => '🖥️ System',
     
 //Footer dev
 'footer_sviluppato' => 'Developed by',

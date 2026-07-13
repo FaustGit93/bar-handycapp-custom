@@ -93,9 +93,12 @@ $t = [
 'all_molluschi'  => 'Moluscos',
 
 //Theme
-'tema_chiaro'=> '☀️',
+'tema_chiaro' => '☀️',
+'tema_chiaro_testo' => '☀️ Claro',
 'tema_scuro' => '🌙',
+'tema_scuro_testo' => '🌙 Escuro',
 'tema_sistema' => '🖥️',
+'tema_sistema_testo' => '🖥️ Sistema',
 
 
 //Footer dev
