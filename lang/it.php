@@ -91,7 +91,7 @@ $t = [
 'all_lupini'     => 'Lupini',
 'all_molluschi'  => 'Molluschi',
 
-
+//Theme
 'tema_chiaro' => '☀️ Chiaro',
 'tema_scuro' => '🌙 Scuro',
 'tema_sistema' => '🖥️ Sistema',
