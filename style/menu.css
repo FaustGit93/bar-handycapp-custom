@@ -146,6 +146,8 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 .lang-fab { bottom: 20px; }
 .theme-fab { bottom: 80px; }
 
+
+
 .lang-fab input[type="checkbox"],
 .theme-fab input[type="checkbox"] { display: none !important; }
 
@@ -179,7 +181,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     border: 1px solid var(--border-fab);
     border-radius: 8px;
     overflow: hidden;
-    min-width: 90px;
+    min-width: 60px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
 
