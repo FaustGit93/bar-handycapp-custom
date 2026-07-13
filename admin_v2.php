@@ -343,7 +343,7 @@ $etichette_lingue = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bar HandyCapp - Admin</title>
+        <title>Interactive Menu - FYR</title>
     <script>
         (function() {
             var saved = localStorage.getItem('theme');
