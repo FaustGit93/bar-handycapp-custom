@@ -193,7 +193,6 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         <div class="footer-social">
 
             <a href="https://www.instagram.com/fah.visuals/
-               target="_blank"
                rel="noopener noreferrer"
                aria-label="Instagram">
                 <i class="fa-brands fa-instagram"></i>
