@@ -213,6 +213,14 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
                 <i class="fa-brands fa-whatsapp"></i>
             </a>
 
+         <!----        <a href="https://wa.me/393775749619"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="WhatsApp">
+                <i class="fa-brands fa-facebook"></i>
+            </a>
+----->
+
         </div>
 
     </div>
