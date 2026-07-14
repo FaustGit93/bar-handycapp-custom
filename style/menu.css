@@ -151,7 +151,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 
 .sticky-nav a:active {
     transform: scale(0.96);
-    color: var(--accent-sticky);
+   
 }
 
 
