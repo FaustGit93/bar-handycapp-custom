@@ -25,6 +25,7 @@ html[data-theme="light"] {
     --text-nav-hover: #111;
     --accent: #e08e00;
     --accent-allergens: #ffc107;
+     --accent-sticky: #ffc107;
     --text-desc: #666;
     --border-item: #e0e0e0;
     --bg-allergeni: #f0f0f0;
@@ -43,6 +44,7 @@ html[data-theme="light"] {
         --text-nav-hover: #111;
         --accent: #e08e00;
         --accent-allergens: #ffc107;
+         --accent-sticky: #ffc107;
         --text-desc: #666;
         --border-item: #e0e0e0;
         --bg-allergeni: #f0f0f0;
@@ -78,15 +80,25 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 
-/* NAV CATEGORIE MENU */
+/* ============================= */
+/* STICKY NAV CATEGORIE MENU */
+/* ============================= */
+
 .sticky-nav {
     display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 10px;
+    align-items: center;
     gap: 8px;
 
-    /* nasconde scrollbar */
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    white-space: nowrap;
+
+    padding: 10px 12px;
+
+    -webkit-overflow-scrolling: touch;
+
+    /* Nasconde scrollbar */
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -96,35 +108,37 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 
-/* BOTTONI STILE APP */
+/* BOTTONI CATEGORIE */
+
 .sticky-nav a {
     flex-shrink: 0;
-
-    color: var(--text-nav);
-    text-decoration: none;
-
-    padding: 9px 18px;
-
-    font-weight: bold;
-    font-size: 14px;
 
     display: inline-flex;
     align-items: center;
     justify-content: center;
 
-    border-radius: 999px;
+    padding: 9px 18px;
+
+    color: var(--text-nav);
+    text-decoration: none;
+
+    font-size: 14px;
+    font-weight: bold;
 
     background: var(--bg-body);
-    border: 1px solid var(--border-item);
 
-    transition: 
-        color .2s ease,
+    border: 1px solid var(--border-item);
+    border-radius: 999px;
+
+    transition:
         background-color .2s ease,
-        border-color .2s ease;
+        color .2s ease,
+        border-color .2s ease,
+        transform .1s ease;
 }
 
 
-/* Hover desktop */
+/* HOVER SOLO CON MOUSE */
 @media (hover: hover) {
 
     .sticky-nav a:hover {
@@ -135,19 +149,28 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 
-/* Categoria attiva ESISTENTE */
+/* CATEGORIA ATTIVA DOPO CLICK */
+
 .sticky-nav a.attiva {
-    background: var(--accent);
+    background: var(--accent-sticky);
     border-color: var(--accent-sticky);
-    color: #e5fe00;
+    color: #000;
 }
 
 
-/* Mobile */
-@media (max-width: 768px) {
+/* FEEDBACK TOUCH MOBILE */
+
+.sticky-nav a:active {
+    transform: scale(0.96);
+}
+
+
+/* DESKTOP */
+
+@media (min-width: 769px) {
 
     .sticky-nav {
-        padding: 10px 12px;
+        justify-content: center;
     }
 
 }
