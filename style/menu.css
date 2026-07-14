@@ -7,6 +7,8 @@
     --text-nav-hover: #fff;
     --accent: #ffc107;
     --accent-allergens: #ffc107;
+        --accent-sticky: #ffc107;
+
     --text-desc: #aaa;
     --border-item: #333;
     --bg-allergeni: #1a1a1a;
@@ -42,6 +44,7 @@ html[data-theme="light"] {
         --text-nav-hover: #111;
         --accent: #e08e00;
         --accent-allergens: #ffc107;
+        --accent-sticky:#ffc107;
         --text-desc: #666;
         --border-item: #e0e0e0;
         --bg-allergeni: #f0f0f0;
@@ -60,6 +63,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     top: 0;
     z-index: 999;
     background-color: var(--bg-header);
+
 }
 
 .menu-logo {
@@ -77,13 +81,78 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 
 .sticky-nav {
     display: flex;
+    align-items: center;
+    gap: 8px;
+
     overflow-x: auto;
+    overflow-y: hidden;
+
     white-space: nowrap;
-    padding: 10px;
+    padding: 12px 16px;
+
+    -webkit-overflow-scrolling: touch;
 }
 
-.sticky-nav a { color: var(--text-nav); text-decoration: none; padding: 8px 16px; font-weight: bold; font-size: 14px; display: inline-block; }
-.sticky-nav a:hover { color: var(--text-nav-hover); }
+/* Mobile: scrollbar nascosta */
+@media (max-width: 768px) {
+    .sticky-nav {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .sticky-nav::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* Desktop: scrollbar visibile */
+@media (min-width: 769px) {
+    .sticky-nav {
+        justify-content: center;
+    }
+
+    .sticky-nav::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .sticky-nav::-webkit-scrollbar-thumb {
+        background: var(--border-item);
+        border-radius: 999px;
+    }
+
+    .sticky-nav::-webkit-scrollbar-track {
+        background: transparent;
+    }
+}
+
+.sticky-nav a {
+    flex-shrink: 0;
+
+    color: var(--text-nav);
+    text-decoration: none;
+
+    padding: 10px 18px;
+
+    font-weight: 600;
+    font-size: 14px;
+
+    border-radius: 999px;
+
+    transition:
+        background-color .2s ease,
+        color .2s ease,
+        transform .15s ease;
+}
+
+.sticky-nav a:hover {
+    color: var(--text-nav-hover);
+    background: var(--border-item);
+}
+
+.sticky-nav a:active {
+    transform: scale(0.96);
+}
+
 
 /* 2. STRUTTURA DEL LAYOUT DEI PIATTI */
 .menu-container { padding: 20px; max-width: 600px; margin: 0 auto; }
