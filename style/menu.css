@@ -7,8 +7,6 @@
     --text-nav-hover: #fff;
     --accent: #ffc107;
     --accent-allergens: #ffc107;
-        --accent-sticky: #ffc107;
-
     --text-desc: #aaa;
     --border-item: #333;
     --bg-allergeni: #1a1a1a;
@@ -44,7 +42,6 @@ html[data-theme="light"] {
         --text-nav-hover: #111;
         --accent: #e08e00;
         --accent-allergens: #ffc107;
-        --accent-sticky:#ffc107;
         --text-desc: #666;
         --border-item: #e0e0e0;
         --bg-allergeni: #f0f0f0;
@@ -63,7 +60,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     top: 0;
     z-index: 999;
     background-color: var(--bg-header);
-
+    
 }
 
 .menu-logo {
@@ -79,79 +76,79 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     width: auto;
 }
 
+
+/* NAV CATEGORIE MENU */
 .sticky-nav {
     display: flex;
-    align-items: center;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
     gap: 8px;
 
-    overflow-x: auto;
-    overflow-y: hidden;
-
-    white-space: nowrap;
-    padding: 12px 16px;
-
-    -webkit-overflow-scrolling: touch;
+    /* nasconde scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-/* Mobile: scrollbar nascosta */
-@media (max-width: 768px) {
-    .sticky-nav {
-        scrollbar-width: none;
-        -ms-overflow-style: none;
-    }
-
-    .sticky-nav::-webkit-scrollbar {
-        display: none;
-    }
+.sticky-nav::-webkit-scrollbar {
+    display: none;
 }
 
-/* Desktop: scrollbar visibile */
-@media (min-width: 769px) {
-    .sticky-nav {
-        justify-content: center;
-    }
 
-    .sticky-nav::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .sticky-nav::-webkit-scrollbar-thumb {
-        background: var(--border-item);
-        border-radius: 999px;
-    }
-
-    .sticky-nav::-webkit-scrollbar-track {
-        background: transparent;
-    }
-}
-
+/* BOTTONI STILE APP */
 .sticky-nav a {
     flex-shrink: 0;
 
     color: var(--text-nav);
     text-decoration: none;
 
-    padding: 10px 18px;
+    padding: 9px 18px;
 
-    font-weight: 600;
+    font-weight: bold;
     font-size: 14px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
     border-radius: 999px;
 
-    transition:
-        background-color .2s ease,
+    background: var(--bg-body);
+    border: 1px solid var(--border-item);
+
+    transition: 
         color .2s ease,
-        transform .15s ease;
+        background-color .2s ease,
+        border-color .2s ease;
 }
 
-.sticky-nav a:hover {
-    color: var(--text-nav-hover);
-    background: var(--border-item);
+
+/* Hover desktop */
+@media (hover: hover) {
+
+    .sticky-nav a:hover {
+        color: var(--text-nav-hover);
+        border-color: var(--accent);
+    }
+
 }
 
-.sticky-nav a:active {
-    transform: scale(0.96);
-   
+
+/* Categoria attiva ESISTENTE */
+.sticky-nav a.attiva {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+}
+
+
+/* Mobile */
+@media (max-width: 768px) {
+
+    .sticky-nav {
+        padding: 10px 12px;
+    }
+
 }
 
 
