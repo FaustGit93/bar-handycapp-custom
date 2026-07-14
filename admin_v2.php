@@ -406,6 +406,7 @@ $etichette_lingue = [
         </div>
     </div>
 
+     
     <h1><?php echo $t['pannello_admin']; ?></h1>
 
     <!-- ===== SEZIONE CATEGORIE ===== -->

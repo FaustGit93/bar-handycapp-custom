@@ -1,6 +1,9 @@
 <?php
 $t = [
     
+
+      'menu_text' => 'Menu',
+
     'traduci_nome' => 'Automatically translate the name', // en.php
 
     // Login

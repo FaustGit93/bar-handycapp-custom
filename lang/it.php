@@ -1,6 +1,9 @@
 <?php
 $t = [
 
+    //Menu Text
+    'menu_text' => 'Menu',
+
     'traduci_nome' => 'Traduci il nome automaticamente',  // it.php
     // Login
     'titolo'                    => 'Area Riservata',

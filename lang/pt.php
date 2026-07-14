@@ -1,5 +1,7 @@
 <?php
 $t = [
+
+  'menu_text' => 'Menu',
     
     'traduci_nome' => 'Traduzir o nome automaticamente',  // pt.php
 
