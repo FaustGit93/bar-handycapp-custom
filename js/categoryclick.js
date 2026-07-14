@@ -4,6 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const titles = document.querySelectorAll(".category-title");
 
 
+    /*
+        Attiva una categoria nella navbar
+    */
     function attivaCategoria(id) {
 
         links.forEach(link => {
@@ -14,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 link.classList.add("attiva");
 
+                // Porta la categoria visibile nella navbar
                 link.scrollIntoView({
                     behavior: "smooth",
                     block: "nearest",
@@ -29,16 +33,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /*
-        CLICK MANUALE
-    */
+        CLICK SULLA CATEGORIA
 
+        Mantiene il comportamento
+        originale degli anchor #cat-id
+    */
     links.forEach(link => {
 
         link.addEventListener("click", function() {
 
             const id = this
                 .getAttribute("href")
-                .substring(1);
+                .replace("#", "");
 
             attivaCategoria(id);
 
@@ -49,10 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /*
-        CAMBIO AUTOMATICO SCROLL
-        basato sui titoli categoria
-    */
+        CAMBIO AUTOMATICO DURANTE LO SCROLL
 
+        Osserviamo solo i titoli
+        delle categorie
+    */
     const observer = new IntersectionObserver(entries => {
 
 
@@ -62,14 +69,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (entry.isIntersecting) {
 
 
-                const title = entry.target;
+                const sezione = entry.target
+                    .closest(".category-section");
 
-                const section = title.closest(".category-section");
 
+                if (sezione) {
 
-                if (section) {
-
-                    attivaCategoria(section.id);
+                    attivaCategoria(sezione.id);
 
                 }
 
@@ -82,17 +88,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }, {
 
         /*
-            La categoria cambia quando
-            il titolo passa vicino alla navbar
+            Zona vicino alla navbar.
+            Cambia categoria quando
+            il titolo arriva in alto.
         */
-
-        rootMargin: "-100px 0px -80% 0px",
+        rootMargin: "-120px 0px -75% 0px",
         threshold: 0
 
     });
 
 
 
+    /*
+        Avvia osservazione titoli
+    */
     titles.forEach(title => {
 
         observer.observe(title);
