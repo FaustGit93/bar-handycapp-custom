@@ -95,18 +95,42 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 .item-price { color: var(--accent); margin-left: 10px; }
 .item-description { font-size: 14px; color: var(--text-desc); margin: 5px 0 0 0; font-weight: normal; }
 
+
 .icona-allergeni {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     text-decoration: none;
-    font-size: 14px;
-    margin-left: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 8px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: var(--bg-allergeni);
+    color: var(--accent);
     cursor: pointer;
+    vertical-align: middle;
+    transition: background-color .15s ease;
+}
+
+.icona-allergeni:hover {
+    background: var(--border-item);
+}
+
+.freccia-allergeni {
+    font-size: 9px;
+    transition: transform .2s ease;
+    display: inline-block;
+}
+
+.icona-allergeni.attivo .freccia-allergeni {
+    transform: rotate(180deg);
 }
 
 .dettaglio-allergeni {
-    display: grid;
-    grid-template-rows: 0fr;
-    transition: grid-template-rows .25s ease;
+    max-height: 0;
     overflow: hidden;
+    transition: max-height .2s ease;
     font-size: 13px;
     color: var(--text-allergeni);
     background: var(--bg-allergeni);
@@ -114,29 +138,13 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 .dettaglio-allergeni-inner {
-    overflow: hidden;
-    min-height: 0;
-    padding: 0 10px;
-}
-
-.dettaglio-allergeni.aperto {
-    grid-template-rows: 1fr;
-    margin-top: 8px;
-}
-
-.dettaglio-allergeni.aperto .dettaglio-allergeni-inner {
     padding: 8px 10px;
 }
 
-.dettaglio-allergeni strong {
-    color: var(--accent);
+.dettaglio-allergeni.aperto {
+    margin-top: 8px;
 }
 
-.dettaglio-allergeni p {
-    margin: 6px 0 0 0;
-    font-style: italic;
-    color: #999;
-}
 
 /* ── FAB comuni (lingua + tema) ── */
 .lang-fab, .theme-fab {

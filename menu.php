@@ -108,7 +108,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
                     echo "  <div class='item-main'>";
                     echo "    <span class='item-name'>" . htmlspecialchars($nome_piatto);
                     if ($ha_allergeni) {
-                        echo " <a href='#' class='icona-allergeni' onclick=\"document.getElementById('allergeni-$id_piatto_corrente').classList.toggle('aperto'); return false;\">⚠️</a>";
+                        echo " <a href='#' class='icona-allergeni' data-target='allergeni-$id_piatto_corrente'>⚠️ " . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . " <span class='freccia-allergeni'>▾</span></a>";
                     }
                     echo "</span>";
                     echo "    <span class='item-price'>€" . number_format($piatto['prezzo'], 2, ',', '.') . "</span>";
@@ -216,10 +216,17 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         </div>
 
     </div>
+
+
+          <p class="footer-piva">
+   <!---- 12345678 ---->
+</p>
+
 </footer>
 
 <script src="js/menuheader.js"></script>
 <script src="js/menutheme.js"></script>
+<script src="js/menuallergeni.js"></script>
 <script src="js/menu.js"></script>
 
 
