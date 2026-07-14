@@ -6,6 +6,7 @@
     --text-nav: #ccc;
     --text-nav-hover: #fff;
     --accent: #ffc107;
+    --accent-allergens: #ffc107;
     --text-desc: #aaa;
     --border-item: #333;
     --bg-allergeni: #1a1a1a;
@@ -22,6 +23,7 @@ html[data-theme="light"] {
     --text-nav: #555;
     --text-nav-hover: #111;
     --accent: #e08e00;
+    --accent-allergens: #ffc107;
     --text-desc: #666;
     --border-item: #e0e0e0;
     --bg-allergeni: #f0f0f0;
@@ -39,6 +41,7 @@ html[data-theme="light"] {
         --text-nav: #555;
         --text-nav-hover: #111;
         --accent: #e08e00;
+        --accent-allergens: #ffc107;
         --text-desc: #666;
         --border-item: #e0e0e0;
         --bg-allergeni: #f0f0f0;
@@ -107,7 +110,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
     padding: 3px 8px;
     border-radius: 12px;
     background: var(--bg-allergeni);
-    color: var(--accent);
+    color: var(--accent-allergens);
     cursor: pointer;
     vertical-align: middle;
     transition: background-color .15s ease;
@@ -119,7 +122,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 
 .freccia-allergeni {
     font-size: 9px;
-    transition: transform .2s ease;
+    transition: transform .1s ease;
     display: inline-block;
 }
 
@@ -130,7 +133,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 .dettaglio-allergeni {
     max-height: 0;
     overflow: hidden;
-    transition: max-height .2s ease;
+    transition: max-height .1s ease;
     font-size: 13px;
     color: var(--text-allergeni);
     background: var(--bg-allergeni);
