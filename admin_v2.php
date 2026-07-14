@@ -393,6 +393,14 @@ $etichette_lingue = [
                 <a href="?lang=pt" class="<?php echo $lang === 'pt' ? 'attiva' : ''; ?>">
                     <img src="https://flagcdn.com/w40/br.png" width="24" height="18"> Português
                 </a>
+
+                <!---- TO DO: French - Spanish 
+                   
+                    
+                    
+                
+                ------>
+
             </div>
         </div>
         </div>

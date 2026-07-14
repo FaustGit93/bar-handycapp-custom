@@ -218,7 +218,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
     </div>
 </footer>
 
-
+<script src="js/menuheader.js"></script>
 <script src="js/menutheme.js"></script>
 <script src="js/menu.js"></script>
 
