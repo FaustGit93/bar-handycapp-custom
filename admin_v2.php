@@ -320,17 +320,10 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
                 traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'descrizione', $descrizione);
             }
 
-            // Gestione immagine: rimozione ha priorità sull'upload di una nuova
-            if ($rimuovi_immagine && !empty($immagine_attuale)) {
-                $percorso_da_rimuovere = CARTELLA_IMMAGINI_PIATTI . $immagine_attuale;
-                if (file_exists($percorso_da_rimuovere)) {
-                    unlink($percorso_da_rimuovere);
-                }
-                $stmt_rimuovi_img = $conn->prepare("UPDATE piatti SET immagine = NULL WHERE id = ?");
-                $stmt_rimuovi_img->bind_param("i", $id_piatto);
-                $stmt_rimuovi_img->execute();
-                $stmt_rimuovi_img->close();
-            } elseif ($c_e_nuova_immagine) {
+            // Gestione immagine: un nuovo file caricato ha SEMPRE priorità sulla
+            // rimozione (evita che una spunta lasciata attiva per errore cancelli
+            // l'immagine invece di sostituirla)
+            if ($c_e_nuova_immagine) {
                 $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_piatto, $immagine_attuale);
                 if ($risultato_upload['ok']) {
                     $stmt_img = $conn->prepare("UPDATE piatti SET immagine = ? WHERE id = ?");
@@ -340,6 +333,15 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
                 } else {
                     $messaggio .= "<div class='alert error'>" . messaggio_errore_immagine($risultato_upload['errore'], $t) . "</div>";
                 }
+            } elseif ($rimuovi_immagine && !empty($immagine_attuale)) {
+                $percorso_da_rimuovere = CARTELLA_IMMAGINI_PIATTI . $immagine_attuale;
+                if (file_exists($percorso_da_rimuovere)) {
+                    unlink($percorso_da_rimuovere);
+                }
+                $stmt_rimuovi_img = $conn->prepare("UPDATE piatti SET immagine = NULL WHERE id = ?");
+                $stmt_rimuovi_img->bind_param("i", $id_piatto);
+                $stmt_rimuovi_img->execute();
+                $stmt_rimuovi_img->close();
             }
 
             $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>" . $messaggio;
@@ -376,17 +378,8 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
                 salva_traduzione($conn, 'piatti', $id_piatto, 'descrizione', $lang_modifica, $descrizione, 1);
             }
 
-            // Gestione immagine: rimozione ha priorità sull'upload di una nuova
-            if ($rimuovi_immagine && !empty($immagine_attuale)) {
-                $percorso_da_rimuovere = CARTELLA_IMMAGINI_PIATTI . $immagine_attuale;
-                if (file_exists($percorso_da_rimuovere)) {
-                    unlink($percorso_da_rimuovere);
-                }
-                $stmt_rimuovi_img = $conn->prepare("UPDATE piatti SET immagine = NULL WHERE id = ?");
-                $stmt_rimuovi_img->bind_param("i", $id_piatto);
-                $stmt_rimuovi_img->execute();
-                $stmt_rimuovi_img->close();
-            } elseif ($c_e_nuova_immagine) {
+            // Gestione immagine: un nuovo file caricato ha SEMPRE priorità sulla rimozione
+            if ($c_e_nuova_immagine) {
                 $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_piatto, $immagine_attuale);
                 if ($risultato_upload['ok']) {
                     $stmt_img = $conn->prepare("UPDATE piatti SET immagine = ? WHERE id = ?");
@@ -396,6 +389,15 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
                 } else {
                     $messaggio .= "<div class='alert error'>" . messaggio_errore_immagine($risultato_upload['errore'], $t) . "</div>";
                 }
+            } elseif ($rimuovi_immagine && !empty($immagine_attuale)) {
+                $percorso_da_rimuovere = CARTELLA_IMMAGINI_PIATTI . $immagine_attuale;
+                if (file_exists($percorso_da_rimuovere)) {
+                    unlink($percorso_da_rimuovere);
+                }
+                $stmt_rimuovi_img = $conn->prepare("UPDATE piatti SET immagine = NULL WHERE id = ?");
+                $stmt_rimuovi_img->bind_param("i", $id_piatto);
+                $stmt_rimuovi_img->execute();
+                $stmt_rimuovi_img->close();
             }
 
             $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>" . $messaggio;
@@ -777,30 +779,32 @@ $etichette_lingue = [
                         <?php endif; ?>
                         <div class="prezzo">€<?php echo number_format($piatto['prezzo'], 2, ',', '.'); ?></div>
                     </div>
-                    <?php if (!empty($piatto['immagine'])): ?>
-                        <div class="piatto-thumb">
-                            <img src="img/piatti/<?php echo htmlspecialchars($piatto['immagine']); ?>" alt="<?php echo htmlspecialchars($nome_visualizzato); ?>">
-                        </div>
-                    <?php endif; ?>
-                    <div class="piatto-azioni">
-                        <?php if ($piatto['disponibile'] == 1): ?>
-                            <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
-                               class="badge badge-attivo" title="<?php echo $t['title_disponibile']; ?>">✅</a>
-                        <?php else: ?>
-                            <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
-                               class="badge badge-disattivato" title="<?php echo $t['title_esaurito']; ?>">🚫</a>
+                    <div class="piatto-right">
+                        <?php if (!empty($piatto['immagine'])): ?>
+                            <div class="piatto-thumb">
+                                <img src="img/piatti/<?php echo htmlspecialchars($piatto['immagine']); ?>" alt="<?php echo htmlspecialchars($nome_visualizzato); ?>">
+                            </div>
                         <?php endif; ?>
+                        <div class="piatto-azioni">
+                            <?php if ($piatto['disponibile'] == 1): ?>
+                                <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=0"
+                                   class="badge badge-attivo" title="<?php echo $t['title_disponibile']; ?>">✅</a>
+                            <?php else: ?>
+                                <a href="admin_v2.php?azione=switch_Stato&id=<?php echo $piatto['id']; ?>&stato=1"
+                                   class="badge badge-disattivato" title="<?php echo $t['title_esaurito']; ?>">🚫</a>
+                            <?php endif; ?>
 
-                        <a href="#" class="btn-modifica-icon" title="<?php echo $t['title_modifica']; ?>"
-                           onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
+                            <a href="#" class="btn-modifica-icon" title="<?php echo $t['title_modifica']; ?>"
+                               onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
 
-                        <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
-                           onclick="document.getElementById('trad-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
+                            <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
+                               onclick="document.getElementById('trad-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
 
-                        <a href="admin_v2.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
-                           class="btn-elimina-icon"
-                           title="<?php echo $t['title_elimina']; ?>"
-                           onclick="return confirm('<?php echo $t['confirm_elimina_piatto']; ?> <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
+                            <a href="admin_v2.php?azione=elimina&id=<?php echo $piatto['id']; ?>"
+                               class="btn-elimina-icon"
+                               title="<?php echo $t['title_elimina']; ?>"
+                               onclick="return confirm('<?php echo $t['confirm_elimina_piatto']; ?> <?php echo htmlspecialchars($piatto['nome'], ENT_QUOTES); ?>?');">🗑️</a>
+                        </div>
                     </div>
                 </div>
 
@@ -843,7 +847,7 @@ $etichette_lingue = [
                                     <img src="img/piatti/<?php echo htmlspecialchars($piatto['immagine']); ?>" alt="">
                                     <label style="display:flex; align-items:center; gap:8px; font-weight:normal; margin-top:6px;">
                                         <input type="checkbox" name="rimuovi_immagine" value="1" style="width:auto;">
-                                        <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine attuale'; ?>
+                                        <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine senza sostituirla (non selezionare un nuovo file se spunti questa casella)'; ?>
                                     </label>
                                 </div>
                             <?php endif; ?>

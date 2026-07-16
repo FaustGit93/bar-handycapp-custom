@@ -109,11 +109,21 @@ table .btn-traduzioni-icon {
 /* ── Card piatti ── */
 .piatti-lista { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
 .piatto-card { display: flex; flex-direction: column; align-items: stretch; gap: 12px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--card-bg); }
-.piatto-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.piatto-info { flex: 1; min-width: 0; }
+
+/* flex-wrap consente al gruppo immagine+azioni di andare a capo
+   sotto il nome quando lo spazio orizzontale non basta, invece di
+   schiacciare .piatto-info a larghezza zero (il nome non spariva
+   davvero: diventava largo 0px perché gli elementi a fianco non
+   si restringevano mai) */
+.piatto-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.piatto-info { flex: 1 1 200px; min-width: 200px; }
 .piatto-info .nome { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
 .piatto-info .descrizione { font-size: 13px; color: var(--label-color); margin-top: 3px; line-height: 1.4; }
 .piatto-info .prezzo { font-size: 13px; font-weight: 600; color: var(--text-main); margin-top: 4px; }
+
+/* Gruppo thumbnail + azioni: si muove come un blocco unico,
+   resta ancorato a destra e va a capo tutto insieme se serve */
+.piatto-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto; }
 .piatto-azioni { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
 .badge { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; text-decoration: none; font-size: 18px; border: 1px solid transparent; transition: opacity .15s; }
@@ -273,7 +283,6 @@ table .btn-traduzioni-icon {
 /* Thumbnail immagine nella card del piatto (vista lista) */
 .piatto-thumb {
     flex-shrink: 0;
-    margin: 0 12px;
 }
 
 .piatto-thumb img {
@@ -282,6 +291,7 @@ table .btn-traduzioni-icon {
     object-fit: cover;
     border-radius: 8px;
     border: 1px solid rgba(128, 128, 128, 0.3);
+    display: block;
 }
 
 /* Anteprima immagine attuale nel form di modifica */
@@ -296,4 +306,14 @@ table .btn-traduzioni-icon {
     border-radius: 8px;
     border: 1px solid rgba(128, 128, 128, 0.3);
     display: block;
+}
+
+/* Su schermi molto stretti il gruppo immagine+azioni occupa
+   tutta la larghezza e si allinea a destra sulla sua riga */
+@media (max-width: 480px) {
+    .piatto-right {
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
