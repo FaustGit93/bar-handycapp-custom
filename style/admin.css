@@ -267,3 +267,33 @@ table .btn-traduzioni-icon {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
+
+/* ===== Gestione immagine piatto ===== */
+
+/* Thumbnail immagine nella card del piatto (vista lista) */
+.piatto-thumb {
+    flex-shrink: 0;
+    margin: 0 12px;
+}
+
+.piatto-thumb img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+/* Anteprima immagine attuale nel form di modifica */
+.anteprima-immagine-attuale {
+    margin-bottom: 10px;
+}
+
+.anteprima-immagine-attuale img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    display: block;
+}
