@@ -111,7 +111,13 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
                         echo " <a href='#' class='icona-allergeni' data-target='allergeni-$id_piatto_corrente'>⚠️ " . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . " <span class='freccia-allergeni'>▾</span></a>";
                     }
                     echo "</span>";
-                    echo "    <span class='item-price'>€" . number_format($piatto['prezzo'], 2, ',', '.') . "</span>";
+                    echo "    <span class='item-right'>";
+                    if (!empty($piatto['immagine'])) {
+                        $percorso_immagine = "img/piatti/" . htmlspecialchars($piatto['immagine']);
+                        echo "      <img src='" . $percorso_immagine . "' alt='" . htmlspecialchars($nome_piatto) . "' class='item-image-thumb' data-full='" . $percorso_immagine . "'>";
+                    }
+                    echo "      <span class='item-price'>€" . number_format($piatto['prezzo'], 2, ',', '.') . "</span>";
+                    echo "    </span>";
                     echo "  </div>";
 
                     if (!empty($desc_piatto)) {
@@ -140,6 +146,12 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
         ?>
     </div>
 
+
+    <!-- Lightbox immagine piatto -->
+    <div class="img-lightbox" id="img-lightbox">
+        <button type="button" class="img-lightbox-close" id="img-lightbox-close" aria-label="Chiudi">✕</button>
+        <img src="" alt="" id="img-lightbox-img">
+    </div>
 
     <!-- Selettore tema floating -->
 <div class="theme-fab">
@@ -236,6 +248,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 <script src="js/menutheme.js"></script>
 <script src="js/categoryclick.js"></script>
 <script src="js/menuallergeni.js"></script>
+<script src="js/menuimmagine.js"></script>
 <script src="js/menu.js"></script>
 
 
