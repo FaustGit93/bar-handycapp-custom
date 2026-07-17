@@ -275,18 +275,6 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
     $traduci_nome = isset($_POST['traduci_nome']) ? 1 : 0;
     $lang_modifica = $_POST['lang_modifica'] ?? LINGUA_BASE;
 
-    // Recuperiamo l'immagine attualmente salvata (serve sia per l'eventuale
-    // sostituzione sia per l'eventuale rimozione), indipendentemente dalla lingua attiva
-    $res_img_corrente = $conn->prepare("SELECT immagine FROM piatti WHERE id = ?");
-    $res_img_corrente->bind_param("i", $id_piatto);
-    $res_img_corrente->execute();
-    $riga_img_corrente = $res_img_corrente->get_result()->fetch_assoc();
-    $immagine_attuale = $riga_img_corrente['immagine'] ?? null;
-    $res_img_corrente->close();
-
-    $rimuovi_immagine = isset($_POST['rimuovi_immagine']) ? 1 : 0;
-    $c_e_nuova_immagine = isset($_FILES['immagine']) && $_FILES['immagine']['error'] !== UPLOAD_ERR_NO_FILE;
-
     if ($lang_modifica === LINGUA_BASE) {
         // --- Modifica sulla lingua base: comportamento originale ---
         $stmt = $conn->prepare("UPDATE piatti SET categoria_id = ?, nome = ?, descrizione = ?, note_allergeni = ?, prezzo = ?, disponibile = ? WHERE id = ?");
@@ -320,31 +308,7 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
                 traduci_e_salva_tutto($conn, 'piatti', $id_piatto, 'descrizione', $descrizione);
             }
 
-            // Gestione immagine: un nuovo file caricato ha SEMPRE priorità sulla
-            // rimozione (evita che una spunta lasciata attiva per errore cancelli
-            // l'immagine invece di sostituirla)
-            if ($c_e_nuova_immagine) {
-                $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_piatto, $immagine_attuale);
-                if ($risultato_upload['ok']) {
-                    $stmt_img = $conn->prepare("UPDATE piatti SET immagine = ? WHERE id = ?");
-                    $stmt_img->bind_param("si", $risultato_upload['nome_file'], $id_piatto);
-                    $stmt_img->execute();
-                    $stmt_img->close();
-                } else {
-                    $messaggio .= "<div class='alert error'>" . messaggio_errore_immagine($risultato_upload['errore'], $t) . "</div>";
-                }
-            } elseif ($rimuovi_immagine && !empty($immagine_attuale)) {
-                $percorso_da_rimuovere = CARTELLA_IMMAGINI_PIATTI . $immagine_attuale;
-                if (file_exists($percorso_da_rimuovere)) {
-                    unlink($percorso_da_rimuovere);
-                }
-                $stmt_rimuovi_img = $conn->prepare("UPDATE piatti SET immagine = NULL WHERE id = ?");
-                $stmt_rimuovi_img->bind_param("i", $id_piatto);
-                $stmt_rimuovi_img->execute();
-                $stmt_rimuovi_img->close();
-            }
-
-            $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>" . $messaggio;
+            $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>";
         } else {
             $messaggio = "<div class='alert error'>" . $t['piatto_errore_agg'] . "</div>";
         }
@@ -378,33 +342,52 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'modifica') {
                 salva_traduzione($conn, 'piatti', $id_piatto, 'descrizione', $lang_modifica, $descrizione, 1);
             }
 
-            // Gestione immagine: un nuovo file caricato ha SEMPRE priorità sulla rimozione
-            if ($c_e_nuova_immagine) {
-                $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_piatto, $immagine_attuale);
-                if ($risultato_upload['ok']) {
-                    $stmt_img = $conn->prepare("UPDATE piatti SET immagine = ? WHERE id = ?");
-                    $stmt_img->bind_param("si", $risultato_upload['nome_file'], $id_piatto);
-                    $stmt_img->execute();
-                    $stmt_img->close();
-                } else {
-                    $messaggio .= "<div class='alert error'>" . messaggio_errore_immagine($risultato_upload['errore'], $t) . "</div>";
-                }
-            } elseif ($rimuovi_immagine && !empty($immagine_attuale)) {
-                $percorso_da_rimuovere = CARTELLA_IMMAGINI_PIATTI . $immagine_attuale;
-                if (file_exists($percorso_da_rimuovere)) {
-                    unlink($percorso_da_rimuovere);
-                }
-                $stmt_rimuovi_img = $conn->prepare("UPDATE piatti SET immagine = NULL WHERE id = ?");
-                $stmt_rimuovi_img->bind_param("i", $id_piatto);
-                $stmt_rimuovi_img->execute();
-                $stmt_rimuovi_img->close();
-            }
-
-            $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>" . $messaggio;
+            $messaggio = "<div class='alert success'>" . $t['piatto_aggiornato'] . "</div>";
         } else {
             $messaggio = "<div class='alert error'>" . $t['piatto_errore_agg'] . "</div>";
         }
         $stmt->close();
+    }
+}
+
+// --- LOGICA PIATTI: GESTIONE IMMAGINE (azione dedicata, separata dalla modifica testi) ---
+if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'gestisci_immagine') {
+    $id_piatto_img = intval($_POST['id_piatto']);
+    $rimuovi_immagine = isset($_POST['rimuovi_immagine']) ? 1 : 0;
+    $c_e_nuova_immagine = isset($_FILES['immagine']) && $_FILES['immagine']['error'] !== UPLOAD_ERR_NO_FILE;
+
+    $res_img_corrente = $conn->prepare("SELECT immagine FROM piatti WHERE id = ?");
+    $res_img_corrente->bind_param("i", $id_piatto_img);
+    $res_img_corrente->execute();
+    $riga_img_corrente = $res_img_corrente->get_result()->fetch_assoc();
+    $immagine_attuale = $riga_img_corrente['immagine'] ?? null;
+    $res_img_corrente->close();
+
+    // Un nuovo file caricato ha SEMPRE priorità sulla rimozione (evita che
+    // una spunta lasciata attiva per errore cancelli l'immagine invece di sostituirla)
+    if ($c_e_nuova_immagine) {
+        $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_piatto_img, $immagine_attuale);
+        if ($risultato_upload['ok']) {
+            $stmt_img = $conn->prepare("UPDATE piatti SET immagine = ? WHERE id = ?");
+            $stmt_img->bind_param("si", $risultato_upload['nome_file'], $id_piatto_img);
+            $stmt_img->execute();
+            $stmt_img->close();
+            $messaggio = "<div class='alert success'>" . ($t['immagine_salvata'] ?? 'Immagine aggiornata!') . "</div>";
+        } else {
+            $messaggio = "<div class='alert error'>" . messaggio_errore_immagine($risultato_upload['errore'], $t) . "</div>";
+        }
+    } elseif ($rimuovi_immagine && !empty($immagine_attuale)) {
+        $percorso_da_rimuovere = CARTELLA_IMMAGINI_PIATTI . $immagine_attuale;
+        if (file_exists($percorso_da_rimuovere)) {
+            unlink($percorso_da_rimuovere);
+        }
+        $stmt_rimuovi_img = $conn->prepare("UPDATE piatti SET immagine = NULL WHERE id = ?");
+        $stmt_rimuovi_img->bind_param("i", $id_piatto_img);
+        $stmt_rimuovi_img->execute();
+        $stmt_rimuovi_img->close();
+        $messaggio = "<div class='alert success'>" . ($t['immagine_rimossa'] ?? 'Immagine rimossa!') . "</div>";
+    } else {
+        $messaggio = "<div class='alert error'>" . ($t['immagine_nessuna_azione'] ?? 'Seleziona un file oppure spunta la rimozione.') . "</div>";
     }
 }
 
@@ -797,6 +780,9 @@ $etichette_lingue = [
                             <a href="#" class="btn-modifica-icon" title="<?php echo $t['title_modifica']; ?>"
                                onclick="document.getElementById('edit-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
 
+                            <a href="#" class="btn-immagine-icon" title="<?php echo $t['title_immagine'] ?? 'Immagine'; ?>"
+                               onclick="document.getElementById('img-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">🖼️</a>
+
                             <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
                                onclick="document.getElementById('trad-<?php echo $piatto['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
 
@@ -809,7 +795,7 @@ $etichette_lingue = [
                 </div>
 
                 <div class="form-modifica" id="edit-<?php echo $piatto['id']; ?>">
-                    <form action="admin_v2.php" method="POST" enctype="multipart/form-data">
+                    <form action="admin_v2.php" method="POST">
                         <input type="hidden" name="azione_piatto" value="modifica">
                         <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
                         <input type="hidden" name="lang_modifica" value="<?php echo $lang; ?>">
@@ -838,21 +824,6 @@ $etichette_lingue = [
                         <div class="form-group">
                             <label><?php echo $t['descrizione_label']; ?></label>
                             <textarea name="descrizione" rows="2"><?php echo htmlspecialchars($desc_visualizzata); ?></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label><?php echo $t['immagine_piatto'] ?? 'Immagine del piatto'; ?></label>
-                            <?php if (!empty($piatto['immagine'])): ?>
-                                <div class="anteprima-immagine-attuale">
-                                    <img src="img/piatti/<?php echo htmlspecialchars($piatto['immagine']); ?>" alt="">
-                                    <label style="display:flex; align-items:center; gap:8px; font-weight:normal; margin-top:6px;">
-                                        <input type="checkbox" name="rimuovi_immagine" value="1" style="width:auto;">
-                                        <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine senza sostituirla (non selezionare un nuovo file se spunti questa casella)'; ?>
-                                    </label>
-                                </div>
-                            <?php endif; ?>
-                            <input type="file" name="immagine" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                            <small style="opacity:.7;"><?php echo $t['immagine_vincoli'] ?? 'Formati JPG, PNG o WEBP — peso massimo 2MB'; ?></small>
                         </div>
 
                         <div class="form-group">
@@ -892,6 +863,33 @@ $etichette_lingue = [
                         </div>
 
                         <button type="submit"><?php echo $t['salva_modifiche']; ?></button>
+                    </form>
+                </div>
+
+                <!-- Pannello immagine -->
+                <div class="form-modifica" id="img-<?php echo $piatto['id']; ?>">
+                    <form action="admin_v2.php" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="azione_piatto" value="gestisci_immagine">
+                        <input type="hidden" name="id_piatto" value="<?php echo $piatto['id']; ?>">
+
+                        <div class="form-group">
+                            <label><?php echo $t['immagine_piatto'] ?? 'Immagine del piatto'; ?></label>
+                            <?php if (!empty($piatto['immagine'])): ?>
+                                <div class="anteprima-immagine-attuale">
+                                    <img src="img/piatti/<?php echo htmlspecialchars($piatto['immagine']); ?>" alt="">
+                                    <label style="display:flex; align-items:center; gap:8px; font-weight:normal; margin-top:6px;">
+                                        <input type="checkbox" name="rimuovi_immagine" value="1" style="width:auto;">
+                                        <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine senza sostituirla (non selezionare un nuovo file se spunti questa casella)'; ?>
+                                    </label>
+                                </div>
+                            <?php else: ?>
+                                <p style="font-size:13px; opacity:.7; margin:0 0 10px;"><?php echo $t['immagine_assente'] ?? 'Nessuna immagine caricata per questo piatto.'; ?></p>
+                            <?php endif; ?>
+                            <input type="file" name="immagine" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                            <small style="opacity:.7;"><?php echo $t['immagine_vincoli'] ?? 'Formati JPG, PNG o WEBP — peso massimo 2MB'; ?></small>
+                        </div>
+
+                        <button type="submit"><?php echo $t['salva_immagine'] ?? 'Salva immagine'; ?></button>
                     </form>
                 </div>
 

@@ -134,6 +134,9 @@ table .btn-traduzioni-icon {
 .btn-modifica-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background-color: #fff8e1; border: 1px solid #ffe082; color: #f57f17; text-decoration: none; font-size: 18px; transition: background-color .15s; }
 .btn-modifica-icon:hover { background-color: #ffecb3; }
 
+.btn-immagine-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background-color: #ede7f6; border: 1px solid #b39ddb; color: #5e35b1; text-decoration: none; font-size: 18px; transition: background-color .15s; }
+.btn-immagine-icon:hover { background-color: #d1c4e9; }
+
 .btn-elimina-icon { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background-color: #fff0f0; border: 1px solid #f5c6cb; color: #dc3545; text-decoration: none; font-size: 18px; transition: background-color .15s; }
 .btn-elimina-icon:hover { background-color: #f8d7da; }
 
