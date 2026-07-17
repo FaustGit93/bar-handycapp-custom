@@ -681,7 +681,16 @@ $etichette_lingue = [
 
         <div class="form-group">
             <label for="immagine"><?php echo $t['immagine_piatto'] ?? 'Immagine del piatto (opzionale)'; ?></label>
-            <input type="file" name="immagine" id="immagine" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+            <div class="upload-immagine">
+                <input type="file" name="immagine" id="immagine" class="input-file-nascosto"
+                       accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                       onchange="aggiornaNomeFile(this, 'nome-file-immagine')">
+                <label for="immagine" class="upload-btn" title="<?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?>">
+                    <span class="upload-icon">📤</span>
+                    <span><?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?></span>
+                </label>
+                <span class="upload-nome-file" id="nome-file-immagine"></span>
+            </div>
             <small style="opacity:.7;"><?php echo $t['immagine_vincoli'] ?? 'Formati JPG, PNG o WEBP — peso massimo 2MB'; ?></small>
         </div>
 
@@ -879,17 +888,26 @@ $etichette_lingue = [
                                     <img src="img/piatti/<?php echo htmlspecialchars($piatto['immagine']); ?>" alt="">
                                     <label style="display:flex; align-items:center; gap:8px; font-weight:normal; margin-top:6px;">
                                         <input type="checkbox" name="rimuovi_immagine" value="1" style="width:auto;">
-                                        <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine senza sostituirla (non selezionare un nuovo file se spunti questa casella)'; ?>
+                                        <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine'; ?>
                                     </label>
                                 </div>
                             <?php else: ?>
                                 <p style="font-size:13px; opacity:.7; margin:0 0 10px;"><?php echo $t['immagine_assente'] ?? 'Nessuna immagine caricata per questo piatto.'; ?></p>
                             <?php endif; ?>
-                            <input type="file" name="immagine" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                            <input type="file" name="immagine" id="immagine-<?php echo $piatto['id']; ?>" class="input-file-nascosto"
+                                   accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                   onchange="aggiornaNomeFile(this, 'nome-file-img-<?php echo $piatto['id']; ?>')">
+                            <div class="upload-immagine">
+                                <label for="immagine-<?php echo $piatto['id']; ?>" class="upload-btn" title="<?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?>">
+                                    <span class="upload-icon">📤</span>
+                                    <span><?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?></span>
+                                </label>
+                                <span class="upload-nome-file" id="nome-file-img-<?php echo $piatto['id']; ?>"></span>
+                            </div>
                             <small style="opacity:.7;"><?php echo $t['immagine_vincoli'] ?? 'Formati JPG, PNG o WEBP — peso massimo 2MB'; ?></small>
                         </div>
 
-                        <button type="submit"><?php echo $t['salva_immagine'] ?? 'Salva immagine'; ?></button>
+                        <button type="submit"><?php echo $t['salva_immagine'] ?? 'Salva'; ?></button>
                     </form>
                 </div>
 
@@ -941,6 +959,13 @@ $etichette_lingue = [
 </div>
 
 <script>
+function aggiornaNomeFile(input, idDestinazione) {
+    var destinazione = document.getElementById(idDestinazione);
+    if (destinazione) {
+        destinazione.textContent = input.files.length > 0 ? input.files[0].name : '';
+    }
+}
+
 function mostraTraduzione(idPiatto, lingua) {
     var forms = document.querySelectorAll('[id^="trad-form-' + idPiatto + '-"]');
     forms.forEach(function(f) { f.style.display = 'none'; });

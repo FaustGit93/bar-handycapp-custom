@@ -311,6 +311,60 @@ table .btn-traduzioni-icon {
     display: block;
 }
 
+/* Input file nativo nascosto (accessibile via label) */
+.input-file-nascosto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Bottone di upload personalizzato + nome file selezionato */
+.upload-immagine {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    padding: 8px 16px;
+    background: var(--th-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-main);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 0;
+    transition: background-color .15s, border-color .15s;
+}
+
+.upload-btn:hover {
+    background: var(--border-light);
+    border-color: #5e35b1;
+}
+
+.upload-icon {
+    font-size: 15px;
+}
+
+.upload-nome-file {
+    font-size: 13px;
+    color: var(--label-color);
+    opacity: .8;
+    word-break: break-all;
+}
+
 /* Su schermi molto stretti il gruppo immagine+azioni occupa
    tutta la larghezza e si allinea a destra sulla sua riga */
 @media (max-width: 480px) {
