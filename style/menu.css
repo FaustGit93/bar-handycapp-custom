@@ -188,7 +188,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 
 /* 3. IL SINGOLO PIATTO */
 .menu-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-item); }
-.item-main { display: flex; justify-content: space-between; align-items: baseline; font-size: 18px; font-weight: bold; }
+.item-main { display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; }
 .item-price { color: var(--accent); margin-left: 10px; }
 .item-description { font-size: 14px; color: var(--text-desc); margin: 5px 0 0 0; font-weight: normal; }
 
@@ -237,8 +237,10 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 }
 
 .img-lightbox img {
-    max-width: 92%;
-    max-height: 82%;
+    max-width: min(500px, 90vw);
+    max-height: min(500px, 80vh);
+    width: auto;
+    height: auto;
     border-radius: 10px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
 }
