@@ -30,6 +30,11 @@ if (isset($_COOKIE['lingua_menu'])) {
 // Carichiamo il dizionario della lingua corrente (serve per gli allergeni)
 include "lang/$lang.php";
 
+// Impostazione globale: layout a card per i piatti (0 = lista, 1 = card)
+$res_impostazioni_menu = $conn->query("SELECT * FROM impostazioni WHERE id = 1");
+$impostazioni_menu = $res_impostazioni_menu ? $res_impostazioni_menu->fetch_assoc() : null;
+$layout_card_piatti = $impostazioni_menu['layout_card_piatti'] ?? 0;
+
 $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDER BY ordine ASC");
 ?>
 
@@ -84,7 +89,18 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
                 $nome_cat = get_traduzione($conn, 'categorie', $categoria_id, 'nome', $lang) ?? $cat['nome'];
 
                 echo "<section class='category-section' id='cat-" . $categoria_id . "'>";
+
+                // Banner immagine categoria (facoltativo, indipendente dal layout piatti scelto)
+                if (!empty($cat['immagine'])) {
+                    $percorso_banner = "img/categorie/" . htmlspecialchars($cat['immagine']);
+                    echo "<div class='category-banner'><img src='" . $percorso_banner . "' alt='" . htmlspecialchars($nome_cat) . "'></div>";
+                }
+
                 echo "<h2 class='category-title'>" . htmlspecialchars($nome_cat) . "</h2>";
+
+                if ($layout_card_piatti) {
+                    echo "<div class='piatti-grid-card'>";
+                }
 
                 while ($piatto = $piatti_query->fetch_assoc()) {
                     $id_piatto_corrente = $piatto['id'];
@@ -104,40 +120,88 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
                     $ha_note = !empty($piatto['note_allergeni']);
                     $ha_allergeni = count($nomi_allergeni) > 0 || $ha_note;
 
-                    echo "<div class='menu-item'>";
-                    echo "  <div class='item-main'>";
-                    echo "    <span class='item-name'>" . htmlspecialchars($nome_piatto);
-                    if ($ha_allergeni) {
-                        echo " <a href='#' class='icona-allergeni' data-target='allergeni-$id_piatto_corrente'>⚠️ " . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . " <span class='freccia-allergeni'>▾</span></a>";
-                    }
-                    echo "</span>";
-                    echo "    <span class='item-right'>";
-                    if (!empty($piatto['immagine'])) {
-                        $percorso_immagine = "img/piatti/" . htmlspecialchars($piatto['immagine']);
-                        echo "      <img src='" . $percorso_immagine . "' alt='" . htmlspecialchars($nome_piatto) . "' class='item-image-thumb' data-full='" . $percorso_immagine . "'>";
-                    }
-                    echo "      <span class='item-price'>€" . number_format($piatto['prezzo'], 2, ',', '.') . "</span>";
-                    echo "    </span>";
-                    echo "  </div>";
+                    if ($layout_card_piatti) {
+                        // ===== LAYOUT A CARD =====
+                        echo "<div class='menu-item-card'>";
 
-                    if (!empty($desc_piatto)) {
-                        echo "  <p class='item-description'>" . htmlspecialchars($desc_piatto) . "</p>";
-                    }
+                        if (!empty($piatto['immagine'])) {
+                            $percorso_immagine = "img/piatti/" . htmlspecialchars($piatto['immagine']);
+                            echo "  <img src='" . $percorso_immagine . "' alt='" . htmlspecialchars($nome_piatto) . "' class='item-image-thumb menu-item-card-img' data-full='" . $percorso_immagine . "'>";
+                        } else {
+                            echo "  <div class='menu-item-card-img placeholder'>🍽️</div>";
+                        }
 
-                    if ($ha_allergeni) {
-                        echo "  <div class='dettaglio-allergeni' id='allergeni-$id_piatto_corrente'>";
-                        echo "    <div class='dettaglio-allergeni-inner'>";
-                        if (count($nomi_allergeni) > 0) {
-                           echo "      <strong>" . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . ":</strong> " . htmlspecialchars(implode(', ', $nomi_allergeni));
-                        }
-                        if ($ha_note) {
-                            echo "      <p>" . htmlspecialchars($piatto['note_allergeni']) . "</p>";
-                        }
+                        echo "  <div class='menu-item-card-body'>";
+                        echo "    <div class='menu-item-card-top'>";
+                        echo "      <span class='item-name'>" . htmlspecialchars($nome_piatto) . "</span>";
+                        echo "      <span class='item-price'>€" . number_format($piatto['prezzo'], 2, ',', '.') . "</span>";
                         echo "    </div>";
-                        echo "  </div>";
-                    }
 
-                    echo "</div>";
+                        if ($ha_allergeni) {
+                            echo "    <a href='#' class='icona-allergeni' data-target='allergeni-$id_piatto_corrente'>⚠️ " . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . " <span class='freccia-allergeni'>▾</span></a>";
+                        }
+
+                        if (!empty($desc_piatto)) {
+                            echo "    <p class='item-description'>" . htmlspecialchars($desc_piatto) . "</p>";
+                        }
+
+                        if ($ha_allergeni) {
+                            echo "    <div class='dettaglio-allergeni' id='allergeni-$id_piatto_corrente'>";
+                            echo "      <div class='dettaglio-allergeni-inner'>";
+                            if (count($nomi_allergeni) > 0) {
+                                echo "        <strong>" . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . ":</strong> " . htmlspecialchars(implode(', ', $nomi_allergeni));
+                            }
+                            if ($ha_note) {
+                                echo "        <p>" . htmlspecialchars($piatto['note_allergeni']) . "</p>";
+                            }
+                            echo "      </div>";
+                            echo "    </div>";
+                        }
+
+                        echo "  </div>";
+                        echo "</div>";
+
+                    } else {
+                        // ===== LAYOUT A LISTA (comportamento originale) =====
+                        echo "<div class='menu-item'>";
+                        echo "  <div class='item-main'>";
+                        echo "    <span class='item-name'>" . htmlspecialchars($nome_piatto);
+                        if ($ha_allergeni) {
+                            echo " <a href='#' class='icona-allergeni' data-target='allergeni-$id_piatto_corrente'>⚠️ " . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . " <span class='freccia-allergeni'>▾</span></a>";
+                        }
+                        echo "</span>";
+                        echo "    <span class='item-right'>";
+                        if (!empty($piatto['immagine'])) {
+                            $percorso_immagine = "img/piatti/" . htmlspecialchars($piatto['immagine']);
+                            echo "      <img src='" . $percorso_immagine . "' alt='" . htmlspecialchars($nome_piatto) . "' class='item-image-thumb' data-full='" . $percorso_immagine . "'>";
+                        }
+                        echo "      <span class='item-price'>€" . number_format($piatto['prezzo'], 2, ',', '.') . "</span>";
+                        echo "    </span>";
+                        echo "  </div>";
+
+                        if (!empty($desc_piatto)) {
+                            echo "  <p class='item-description'>" . htmlspecialchars($desc_piatto) . "</p>";
+                        }
+
+                        if ($ha_allergeni) {
+                            echo "  <div class='dettaglio-allergeni' id='allergeni-$id_piatto_corrente'>";
+                            echo "    <div class='dettaglio-allergeni-inner'>";
+                            if (count($nomi_allergeni) > 0) {
+                               echo "      <strong>" . htmlspecialchars($t['allergeni'] ?? 'Allergeni') . ":</strong> " . htmlspecialchars(implode(', ', $nomi_allergeni));
+                            }
+                            if ($ha_note) {
+                                echo "      <p>" . htmlspecialchars($piatto['note_allergeni']) . "</p>";
+                            }
+                            echo "    </div>";
+                            echo "  </div>";
+                        }
+
+                        echo "</div>";
+                    }
+                }
+
+                if ($layout_card_piatti) {
+                    echo "</div>"; // .piatti-grid-card
                 }
 
                 echo "</section>";

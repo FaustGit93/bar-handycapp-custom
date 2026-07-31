@@ -186,7 +186,23 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 
 .category-title { font-size: 24px; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-bottom: 20px; }
 
-/* 3. IL SINGOLO PIATTO */
+/* ===== Banner immagine categoria (facoltativo) ===== */
+.category-banner {
+    width: 100%;
+    max-height: 180px;
+    overflow: hidden;
+    border-radius: 12px;
+    margin-bottom: 16px;
+}
+
+.category-banner img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+}
+
+/* 3. IL SINGOLO PIATTO (layout a lista, default) */
 .menu-item { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed var(--border-item); }
 .item-main { display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: bold; }
 .item-price { color: var(--accent); margin-left: 10px; }
@@ -218,6 +234,91 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 
 .item-image-thumb:active {
     transform: scale(0.96);
+}
+
+/* ===== 3b. I PIATTI COME GRIGLIA DI CARD (impostazione globale attiva) ===== */
+.piatti-grid-card {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+}
+
+@media (min-width: 600px) {
+    .piatti-grid-card {
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    }
+}
+
+.menu-item-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-item);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--bg-header);
+}
+
+.menu-item-card-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    display: block;
+    cursor: pointer;
+    border: none;
+    border-radius: 0;
+}
+
+.menu-item-card-img.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-allergeni);
+    color: var(--text-desc);
+    font-size: 30px;
+    cursor: default;
+}
+
+.menu-item-card-body {
+    padding: 10px 12px 12px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-item-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.menu-item-card .item-name {
+    line-height: 1.3;
+}
+
+.menu-item-card .item-price {
+    white-space: nowrap;
+    margin-left: 0;
+}
+
+.menu-item-card .icona-allergeni {
+    margin-left: 0;
+    margin-top: 6px;
+    align-self: flex-start;
+}
+
+.menu-item-card .item-description {
+    margin-top: 6px;
+}
+
+.menu-item-card .dettaglio-allergeni {
+    margin-top: 0;
+}
+
+.menu-item-card .dettaglio-allergeni.aperto {
+    margin-top: 8px;
 }
 
 /* Lightbox immagine piatto a comparsa */

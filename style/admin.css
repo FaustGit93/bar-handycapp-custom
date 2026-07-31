@@ -94,7 +94,8 @@ th { background-color: var(--th-bg); color: var(--text-main); }
 td { color: var(--text-main); }
 
 table .btn-elimina-icon,
-table .btn-traduzioni-icon {
+table .btn-traduzioni-icon,
+table .btn-immagine-icon {
     width: 28px;
     height: 28px;
     font-size: 14px;
@@ -281,7 +282,7 @@ table .btn-traduzioni-icon {
     -webkit-overflow-scrolling: touch;
 }
 
-/* ===== Gestione immagine piatto ===== */
+/* ===== Gestione immagine piatto / categoria ===== */
 
 /* Thumbnail immagine nella card del piatto (vista lista) */
 .piatto-thumb {
@@ -297,7 +298,7 @@ table .btn-traduzioni-icon {
     display: block;
 }
 
-/* Anteprima immagine attuale nel form di modifica */
+/* Anteprima immagine attuale nel form di modifica (piatti e categorie) */
 .anteprima-immagine-attuale {
     margin-bottom: 10px;
 }
@@ -365,6 +366,34 @@ table .btn-traduzioni-icon {
     word-break: break-all;
 }
 
+/* ===== Impostazioni menu (switch layout card globale) ===== */
+.form-impostazioni {
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.switch-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--th-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.switch-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: #007bff;
+    cursor: pointer;
+}
+
 /* Su schermi molto stretti il gruppo immagine+azioni occupa
    tutta la larghezza e si allinea a destra sulla sua riga */
 @media (max-width: 480px) {
@@ -373,4 +402,41 @@ table .btn-traduzioni-icon {
         width: 100%;
         justify-content: flex-end;
     }
+}
+
+#toast-container {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999999;
+    pointer-events: none;
+}
+
+.toast {
+    background: #222;
+    color: #fff;
+    padding: 14px 22px;
+    border-radius: 10px;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+
+    opacity: 0;
+    transform: translateY(20px);
+
+    transition: all .3s ease;
+}
+
+.toast.mostra {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-success {
+    background: #28a745;
+}
+
+.toast-error {
+    background: #dc3545;
 }

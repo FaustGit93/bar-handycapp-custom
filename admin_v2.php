@@ -24,18 +24,21 @@ require_once 'traduzione.php';
 $messaggio = "";
 $messaggio_cat = "";
 
-// --- GESTIONE UPLOAD IMMAGINE PIATTO ---
-// Cartella dove vengono salvate le immagini, formati e peso massimo ammessi
+// --- GESTIONE UPLOAD IMMAGINI (piatti e categorie) ---
+// Cartelle dove vengono salvate le immagini, formati e peso massimo ammessi
 define('CARTELLA_IMMAGINI_PIATTI', __DIR__ . '/img/piatti/');
+define('CARTELLA_IMMAGINI_CATEGORIE', __DIR__ . '/img/categorie/');
 define('PESO_MASSIMO_IMMAGINE', 2 * 1024 * 1024); // 2MB
 
 /**
- * Valida e salva l'immagine caricata per un piatto.
+ * Valida e salva un'immagine caricata (piatto o categoria).
+ * $cartella_destinazione: cartella di destinazione (con slash finale)
+ * $prefisso_file: prefisso usato nel nome del file salvato (es. 'piatto', 'categoria')
  * Ritorna ['ok' => true, 'nome_file' => ...] oppure ['ok' => false, 'errore' => ...]
  */
-function gestisci_upload_immagine($file, $id_piatto, $vecchia_immagine = null) {
-    if (!is_dir(CARTELLA_IMMAGINI_PIATTI)) {
-        mkdir(CARTELLA_IMMAGINI_PIATTI, 0755, true);
+function gestisci_upload_immagine($file, $id_elemento, $cartella_destinazione, $prefisso_file, $vecchia_immagine = null) {
+    if (!is_dir($cartella_destinazione)) {
+        mkdir($cartella_destinazione, 0755, true);
     }
 
     $formati_ammessi = [
@@ -58,8 +61,8 @@ function gestisci_upload_immagine($file, $id_piatto, $vecchia_immagine = null) {
     }
 
     $estensione = $formati_ammessi[$info['mime']];
-    $nome_file = 'piatto_' . $id_piatto . '_' . time() . '.' . $estensione;
-    $percorso_destinazione = CARTELLA_IMMAGINI_PIATTI . $nome_file;
+    $nome_file = $prefisso_file . '_' . $id_elemento . '_' . time() . '.' . $estensione;
+    $percorso_destinazione = $cartella_destinazione . $nome_file;
 
     if (!move_uploaded_file($file['tmp_name'], $percorso_destinazione)) {
         return ['ok' => false, 'errore' => 'salvataggio_fallito'];
@@ -67,7 +70,7 @@ function gestisci_upload_immagine($file, $id_piatto, $vecchia_immagine = null) {
 
     // Rimuoviamo la vecchia immagine, se presente e diversa dalla nuova
     if (!empty($vecchia_immagine)) {
-        $vecchio_percorso = CARTELLA_IMMAGINI_PIATTI . $vecchia_immagine;
+        $vecchio_percorso = $cartella_destinazione . $vecchia_immagine;
         if (file_exists($vecchio_percorso)) {
             unlink($vecchio_percorso);
         }
@@ -119,6 +122,14 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'elimina_cat' && isset($_GET['i
     if ($risultato['totale'] > 0) {
         $messaggio_cat = "<div class='alert error'>⚠️ " . $t['cat_impossibile_el'] . " <strong>" . $risultato['totale'] . "</strong> " . $t['cat_impossibile_el2'] . "</div>";
     } else {
+        // Recuperiamo l'eventuale immagine della categoria per rimuoverla dal server
+        $res_img_cat_del = $conn->prepare("SELECT immagine FROM categorie WHERE id = ?");
+        $res_img_cat_del->bind_param("i", $id_cat);
+        $res_img_cat_del->execute();
+        $riga_img_cat_del = $res_img_cat_del->get_result()->fetch_assoc();
+        $immagine_cat_da_eliminare = $riga_img_cat_del['immagine'] ?? null;
+        $res_img_cat_del->close();
+
         $stmt_tr = $conn->prepare("DELETE FROM traduzioni WHERE tabella = 'categorie' AND riga_id = ?");
         $stmt_tr->bind_param("i", $id_cat);
         $stmt_tr->execute();
@@ -127,6 +138,12 @@ if (isset($_GET['azione']) && $_GET['azione'] == 'elimina_cat' && isset($_GET['i
         $stmt = $conn->prepare("DELETE FROM categorie WHERE id = ?");
         $stmt->bind_param("i", $id_cat);
         if ($stmt->execute()) {
+            if (!empty($immagine_cat_da_eliminare)) {
+                $percorso_cat_da_eliminare = CARTELLA_IMMAGINI_CATEGORIE . $immagine_cat_da_eliminare;
+                if (file_exists($percorso_cat_da_eliminare)) {
+                    unlink($percorso_cat_da_eliminare);
+                }
+            }
             $messaggio_cat = "<div class='alert success'>" . $t['cat_eliminata'] . "</div>";
         } else {
             $messaggio_cat = "<div class='alert error'>" . $t['cat_errore_el'] . "</div>";
@@ -182,6 +199,57 @@ if (isset($_GET['azione']) && in_array($_GET['azione'], ['cat_su', 'cat_giu']) &
         $stmt2->close();
     }
 
+    header("Location: admin_v2.php");
+    exit();
+}
+
+// --- LOGICA CATEGORIE: GESTIONE IMMAGINE (banner categoria, usato in layout a card) ---
+if (isset($_POST['azione_cat']) && $_POST['azione_cat'] == 'gestisci_immagine') {
+    $id_cat_img = intval($_POST['id_categoria']);
+    $rimuovi_immagine_cat = isset($_POST['rimuovi_immagine']) ? 1 : 0;
+    $c_e_nuova_immagine_cat = isset($_FILES['immagine']) && $_FILES['immagine']['error'] !== UPLOAD_ERR_NO_FILE;
+
+    $res_img_cat_corrente = $conn->prepare("SELECT immagine FROM categorie WHERE id = ?");
+    $res_img_cat_corrente->bind_param("i", $id_cat_img);
+    $res_img_cat_corrente->execute();
+    $riga_img_cat_corrente = $res_img_cat_corrente->get_result()->fetch_assoc();
+    $immagine_cat_attuale = $riga_img_cat_corrente['immagine'] ?? null;
+    $res_img_cat_corrente->close();
+
+    // Un nuovo file caricato ha SEMPRE priorità sulla rimozione (stesso principio già usato per i piatti)
+    if ($c_e_nuova_immagine_cat) {
+        $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_cat_img, CARTELLA_IMMAGINI_CATEGORIE, 'categoria', $immagine_cat_attuale);
+        if ($risultato_upload['ok']) {
+            $stmt_img = $conn->prepare("UPDATE categorie SET immagine = ? WHERE id = ?");
+            $stmt_img->bind_param("si", $risultato_upload['nome_file'], $id_cat_img);
+            $stmt_img->execute();
+            $stmt_img->close();
+            $messaggio_cat = "<div class='alert success'>" . ($t['immagine_salvata'] ?? 'Immagine aggiornata!') . "</div>";
+        } else {
+            $messaggio_cat = "<div class='alert error'>" . messaggio_errore_immagine($risultato_upload['errore'], $t) . "</div>";
+        }
+    } elseif ($rimuovi_immagine_cat && !empty($immagine_cat_attuale)) {
+        $percorso_cat_da_rimuovere = CARTELLA_IMMAGINI_CATEGORIE . $immagine_cat_attuale;
+        if (file_exists($percorso_cat_da_rimuovere)) {
+            unlink($percorso_cat_da_rimuovere);
+        }
+        $stmt_rimuovi_img_cat = $conn->prepare("UPDATE categorie SET immagine = NULL WHERE id = ?");
+        $stmt_rimuovi_img_cat->bind_param("i", $id_cat_img);
+        $stmt_rimuovi_img_cat->execute();
+        $stmt_rimuovi_img_cat->close();
+        $messaggio_cat = "<div class='alert success'>" . ($t['immagine_rimossa'] ?? 'Immagine rimossa!') . "</div>";
+    } else {
+        $messaggio_cat = "<div class='alert error'>" . ($t['immagine_nessuna_azione'] ?? 'Seleziona un file oppure spunta la rimozione.') . "</div>";
+    }
+}
+
+// --- LOGICA IMPOSTAZIONI: SALVA LAYOUT CARD GLOBALE ---
+if (isset($_POST['azione']) && $_POST['azione'] == 'salva_impostazioni') {
+    $layout_card_piatti = isset($_POST['layout_card_piatti']) ? 1 : 0;
+    $stmt = $conn->prepare("UPDATE impostazioni SET layout_card_piatti = ? WHERE id = 1");
+    $stmt->bind_param("i", $layout_card_piatti);
+    $stmt->execute();
+    $stmt->close();
     header("Location: admin_v2.php");
     exit();
 }
@@ -366,7 +434,7 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'gestisci_immag
     // Un nuovo file caricato ha SEMPRE priorità sulla rimozione (evita che
     // una spunta lasciata attiva per errore cancelli l'immagine invece di sostituirla)
     if ($c_e_nuova_immagine) {
-        $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_piatto_img, $immagine_attuale);
+        $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $id_piatto_img, CARTELLA_IMMAGINI_PIATTI, 'piatto', $immagine_attuale);
         if ($risultato_upload['ok']) {
             $stmt_img = $conn->prepare("UPDATE piatti SET immagine = ? WHERE id = ?");
             $stmt_img->bind_param("si", $risultato_upload['nome_file'], $id_piatto_img);
@@ -392,7 +460,7 @@ if (isset($_POST['azione_piatto']) && $_POST['azione_piatto'] == 'gestisci_immag
 }
 
 // --- LOGICA PIATTI: INSERIMENTO ---
-if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !isset($_POST['azione_piatto']) && !isset($_POST['azione_traduzione'])) {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !isset($_POST['azione_piatto']) && !isset($_POST['azione_traduzione']) && !isset($_POST['azione'])) {
     $categoria_id = intval($_POST['categoria_id']);
     $nome = trim($_POST['nome']);
     $descrizione = trim($_POST['descrizione']);
@@ -426,7 +494,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['azione_cat']) && !iss
         // Gestione immagine caricata insieme al nuovo piatto (opzionale)
         $messaggio_immagine = "";
         if (isset($_FILES['immagine']) && $_FILES['immagine']['error'] !== UPLOAD_ERR_NO_FILE) {
-            $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $nuovo_id_piatto);
+            $risultato_upload = gestisci_upload_immagine($_FILES['immagine'], $nuovo_id_piatto, CARTELLA_IMMAGINI_PIATTI, 'piatto');
             if ($risultato_upload['ok']) {
                 $stmt_img = $conn->prepare("UPDATE piatti SET immagine = ? WHERE id = ?");
                 $stmt_img->bind_param("si", $risultato_upload['nome_file'], $nuovo_id_piatto);
@@ -451,6 +519,13 @@ while ($c = $cat_lista->fetch_assoc()) {
     $tutte_categorie[] = $c;
 }
 $totale_cat = count($tutte_categorie);
+
+// Impostazioni globali del menu (layout card piatti)
+$res_impostazioni = $conn->query("SELECT * FROM impostazioni WHERE id = 1");
+$impostazioni = $res_impostazioni ? $res_impostazioni->fetch_assoc() : null;
+if (!$impostazioni) {
+    $impostazioni = ['layout_card_piatti' => 0];
+}
 
 $categorie_per_form = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
 $lista_allergeni = $conn->query("SELECT * FROM allergeni ORDER BY id ASC");
@@ -565,6 +640,7 @@ $etichette_lingue = [
                 <th><?php echo $t['col_nome']; ?></th>
                 <th style="text-align:center;"><?php echo $t['col_sposta']; ?></th>
                 <th style="text-align:center;">👁️</th>
+                <th style="text-align:center;">🖼️</th>
                 <th style="text-align:center;">🌐</th>
                 <th><?php echo $t['col_azioni']; ?></th>
             </tr>
@@ -593,6 +669,12 @@ $etichette_lingue = [
                     <?php endif; ?>
                 </td>
                 <td style="text-align:center;">
+                    <a href="#" class="btn-immagine-icon" title="<?php echo $t['title_immagine'] ?? 'Immagine'; ?>"
+                       onclick="document.getElementById('img-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">
+                        <?php echo !empty($cat['immagine']) ? '🖼️' : '📤'; ?>
+                    </a>
+                </td>
+                <td style="text-align:center;">
                     <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
                        onclick="document.getElementById('trad-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
                 </td>
@@ -603,7 +685,44 @@ $etichette_lingue = [
 
             </tr>
             <tr>
-                <td colspan="5" class="trad-cell-wrapper">
+                <td colspan="6" class="trad-cell-wrapper">
+
+                    <!-- Pannello immagine categoria -->
+                    <div class="form-modifica" id="img-cat-<?php echo $cat['id']; ?>" style="margin:0;">
+                        <form action="admin_v2.php" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="azione_cat" value="gestisci_immagine">
+                            <input type="hidden" name="id_categoria" value="<?php echo $cat['id']; ?>">
+
+                            <div class="form-group">
+                                <label><?php echo $t['immagine_categoria'] ?? 'Immagine categoria (banner)'; ?></label>
+                                <?php if (!empty($cat['immagine'])): ?>
+                                    <div class="anteprima-immagine-attuale">
+                                        <img src="img/categorie/<?php echo htmlspecialchars($cat['immagine']); ?>" alt="">
+                                        <label style="display:flex; align-items:center; gap:8px; font-weight:normal; margin-top:6px;">
+                                            <input type="checkbox" name="rimuovi_immagine" value="1" style="width:auto;">
+                                            <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine'; ?>
+                                        </label>
+                                    </div>
+                                <?php else: ?>
+                                    <p style="font-size:13px; opacity:.7; margin:0 0 10px;"><?php echo $t['immagine_assente_categoria'] ?? 'Nessuna immagine caricata per questa categoria.'; ?></p>
+                                <?php endif; ?>
+                                <input type="file" name="immagine" id="immagine-cat-<?php echo $cat['id']; ?>" class="input-file-nascosto"
+                                       accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                                       onchange="aggiornaNomeFile(this, 'nome-file-img-cat-<?php echo $cat['id']; ?>')">
+                                <div class="upload-immagine">
+                                    <label for="immagine-cat-<?php echo $cat['id']; ?>" class="upload-btn" title="<?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?>">
+                                        <span class="upload-icon">📤</span>
+                                        <span><?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?></span>
+                                    </label>
+                                    <span class="upload-nome-file" id="nome-file-img-cat-<?php echo $cat['id']; ?>"></span>
+                                </div>
+                                <small style="opacity:.7;"><?php echo $t['immagine_vincoli'] ?? 'Formati JPG, PNG o WEBP — peso massimo 2MB'; ?></small>
+                            </div>
+
+                            <button type="submit"><?php echo $t['salva_immagine'] ?? 'Salva'; ?></button>
+                        </form>
+                    </div>
+
                     <div class="form-modifica" id="trad-cat-<?php echo $cat['id']; ?>" style="margin:0;">
                         <div class="trad-content">
                         <?php
@@ -643,11 +762,28 @@ $etichette_lingue = [
             </tr>
             <?php endforeach; ?>
             <?php if ($totale_cat === 0): ?>
-                <tr><td colspan="5" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
+                <tr><td colspan="6" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
             <?php endif; ?>
         </tbody>
     </table>
     </div>
+
+    <!-- ===== IMPOSTAZIONI MENU ===== -->
+    <h2><?php echo $t['impostazioni_menu'] ?? 'Impostazioni menu'; ?></h2>
+    <form action="admin_v2.php" method="POST" class="form-impostazioni">
+        <input type="hidden" name="azione" value="salva_impostazioni">
+        <label class="switch-label">
+            <input type="checkbox" name="layout_card_piatti" value="1"
+                   <?php echo ($impostazioni['layout_card_piatti'] == 1) ? 'checked' : ''; ?>
+                   onchange="this.form.submit()">
+            <span>
+                <strong><?php echo $t['layout_card_titolo'] ?? 'Mostra i piatti come card'; ?></strong><br>
+                <small style="font-weight:normal; opacity:.75;">
+                    <?php echo $t['layout_card_descrizione'] ?? 'Vale per tutto il menu pubblico. Le immagini dei piatti restano quelle già caricate; per ogni categoria puoi caricare anche un\'immagine di copertina con l\'icona 🖼️ qui sopra.'; ?>
+                </small>
+            </span>
+        </label>
+    </form>
 
     <hr>
 
@@ -981,7 +1117,9 @@ function mostraTraduzioneCat(idCat, lingua) {
 }
 </script>
 
+<script src="js/toast.js"></script>
 <script src="js/theme.js"></script>
+
 
 </body>
 </html>
