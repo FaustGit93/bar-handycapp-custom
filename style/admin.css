@@ -94,8 +94,7 @@ th { background-color: var(--th-bg); color: var(--text-main); }
 td { color: var(--text-main); }
 
 table .btn-elimina-icon,
-table .btn-traduzioni-icon,
-table .btn-immagine-icon {
+table .btn-traduzioni-icon {
     width: 28px;
     height: 28px;
     font-size: 14px;

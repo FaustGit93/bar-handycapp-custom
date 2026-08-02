@@ -203,7 +203,7 @@ if (isset($_GET['azione']) && in_array($_GET['azione'], ['cat_su', 'cat_giu']) &
     exit();
 }
 
-// --- LOGICA CATEGORIE: GESTIONE IMMAGINE (banner categoria, usato in layout a card) ---
+// --- LOGICA CATEGORIE: GESTIONE IMMAGINE (facoltativa, usata come banner/thumb) ---
 if (isset($_POST['azione_cat']) && $_POST['azione_cat'] == 'gestisci_immagine') {
     $id_cat_img = intval($_POST['id_categoria']);
     $rimuovi_immagine_cat = isset($_POST['rimuovi_immagine']) ? 1 : 0;
@@ -243,11 +243,36 @@ if (isset($_POST['azione_cat']) && $_POST['azione_cat'] == 'gestisci_immagine') 
     }
 }
 
-// --- LOGICA IMPOSTAZIONI: SALVA LAYOUT CARD GLOBALE ---
+// --- LOGICA CATEGORIE: MODIFICA DESCRIZIONE (lingua base + auto-traduzione opzionale) ---
+if (isset($_POST['azione_cat']) && $_POST['azione_cat'] == 'modifica_descrizione') {
+    $id_cat_desc = intval($_POST['id_categoria']);
+    $descrizione_cat = trim($_POST['descrizione_categoria']);
+    $traduci_descrizione = isset($_POST['traduci_descrizione']) ? 1 : 0;
+
+    $stmt = $conn->prepare("UPDATE categorie SET descrizione = ? WHERE id = ?");
+    $stmt->bind_param("si", $descrizione_cat, $id_cat_desc);
+    if ($stmt->execute()) {
+        if ($traduci_descrizione && !empty($descrizione_cat)) {
+            traduci_e_salva_tutto($conn, 'categorie', $id_cat_desc, 'descrizione', $descrizione_cat);
+        } else {
+            $stmt_del_tr = $conn->prepare("DELETE FROM traduzioni WHERE tabella = 'categorie' AND riga_id = ? AND campo = 'descrizione'");
+            $stmt_del_tr->bind_param("i", $id_cat_desc);
+            $stmt_del_tr->execute();
+            $stmt_del_tr->close();
+        }
+        $messaggio_cat = "<div class='alert success'>" . ($t['descrizione_salvata'] ?? 'Descrizione salvata!') . "</div>";
+    } else {
+        $messaggio_cat = "<div class='alert error'>" . ($t['descrizione_errore'] ?? 'Errore nel salvataggio della descrizione.') . "</div>";
+    }
+    $stmt->close();
+}
+
+// --- LOGICA IMPOSTAZIONI: SALVA LAYOUT PIATTI + LAYOUT CATEGORIE ---
 if (isset($_POST['azione']) && $_POST['azione'] == 'salva_impostazioni') {
     $layout_card_piatti = isset($_POST['layout_card_piatti']) ? 1 : 0;
-    $stmt = $conn->prepare("UPDATE impostazioni SET layout_card_piatti = ? WHERE id = 1");
-    $stmt->bind_param("i", $layout_card_piatti);
+    $layout_accordion_categorie = isset($_POST['layout_accordion_categorie']) ? 1 : 0;
+    $stmt = $conn->prepare("UPDATE impostazioni SET layout_card_piatti = ?, layout_accordion_categorie = ? WHERE id = 1");
+    $stmt->bind_param("ii", $layout_card_piatti, $layout_accordion_categorie);
     $stmt->execute();
     $stmt->close();
     header("Location: admin_v2.php");
@@ -317,15 +342,19 @@ if (isset($_POST['azione_traduzione']) && $_POST['azione_traduzione'] == 'salva_
     }
 }
 
-// --- LOGICA CATEGORIE: SALVA TRADUZIONE MANUALE ---
+// --- LOGICA CATEGORIE: SALVA TRADUZIONE MANUALE (nome + descrizione) ---
 if (isset($_POST['azione_traduzione']) && $_POST['azione_traduzione'] == 'salva_categoria') {
     $id_cat_trad = intval($_POST['id_cat_trad']);
     $lingua_trad = $_POST['lingua_trad'];
     $nome_trad = trim($_POST['nome_trad']);
+    $descrizione_trad = trim($_POST['descrizione_trad'] ?? '');
 
     if (in_array($lingua_trad, LINGUE_SUPPORTATE) && $lingua_trad !== LINGUA_BASE) {
         if (!empty($nome_trad)) {
             salva_traduzione($conn, 'categorie', $id_cat_trad, 'nome', $lingua_trad, $nome_trad, 1);
+        }
+        if (!empty($descrizione_trad)) {
+            salva_traduzione($conn, 'categorie', $id_cat_trad, 'descrizione', $lingua_trad, $descrizione_trad, 1);
         }
         $messaggio_cat = "<div class='alert success'>✅ " . ($t['traduzione_salvata'] ?? 'Traduzione salvata!') . "</div>";
     }
@@ -520,11 +549,11 @@ while ($c = $cat_lista->fetch_assoc()) {
 }
 $totale_cat = count($tutte_categorie);
 
-// Impostazioni globali del menu (layout card piatti)
+// Impostazioni globali del menu (layout piatti + layout categorie)
 $res_impostazioni = $conn->query("SELECT * FROM impostazioni WHERE id = 1");
 $impostazioni = $res_impostazioni ? $res_impostazioni->fetch_assoc() : null;
 if (!$impostazioni) {
-    $impostazioni = ['layout_card_piatti' => 0];
+    $impostazioni = ['layout_card_piatti' => 0, 'layout_accordion_categorie' => 0];
 }
 
 $categorie_per_form = $conn->query("SELECT * FROM categorie ORDER BY ordine ASC");
@@ -640,7 +669,6 @@ $etichette_lingue = [
                 <th><?php echo $t['col_nome']; ?></th>
                 <th style="text-align:center;"><?php echo $t['col_sposta']; ?></th>
                 <th style="text-align:center;">👁️</th>
-                <th style="text-align:center;">🖼️</th>
                 <th style="text-align:center;">🌐</th>
                 <th><?php echo $t['col_azioni']; ?></th>
             </tr>
@@ -669,12 +697,6 @@ $etichette_lingue = [
                     <?php endif; ?>
                 </td>
                 <td style="text-align:center;">
-                    <a href="#" class="btn-immagine-icon" title="<?php echo $t['title_immagine'] ?? 'Immagine'; ?>"
-                       onclick="document.getElementById('img-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">
-                        <?php echo !empty($cat['immagine']) ? '🖼️' : '📤'; ?>
-                    </a>
-                </td>
-                <td style="text-align:center;">
                     <a href="#" class="btn-traduzioni-icon" title="Traduzioni"
                        onclick="document.getElementById('trad-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">🌐</a>
                 </td>
@@ -685,44 +707,7 @@ $etichette_lingue = [
 
             </tr>
             <tr>
-                <td colspan="6" class="trad-cell-wrapper">
-
-                    <!-- Pannello immagine categoria -->
-                    <div class="form-modifica" id="img-cat-<?php echo $cat['id']; ?>" style="margin:0;">
-                        <form action="admin_v2.php" method="POST" enctype="multipart/form-data">
-                            <input type="hidden" name="azione_cat" value="gestisci_immagine">
-                            <input type="hidden" name="id_categoria" value="<?php echo $cat['id']; ?>">
-
-                            <div class="form-group">
-                                <label><?php echo $t['immagine_categoria'] ?? 'Immagine categoria (banner)'; ?></label>
-                                <?php if (!empty($cat['immagine'])): ?>
-                                    <div class="anteprima-immagine-attuale">
-                                        <img src="img/categorie/<?php echo htmlspecialchars($cat['immagine']); ?>" alt="">
-                                        <label style="display:flex; align-items:center; gap:8px; font-weight:normal; margin-top:6px;">
-                                            <input type="checkbox" name="rimuovi_immagine" value="1" style="width:auto;">
-                                            <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine'; ?>
-                                        </label>
-                                    </div>
-                                <?php else: ?>
-                                    <p style="font-size:13px; opacity:.7; margin:0 0 10px;"><?php echo $t['immagine_assente_categoria'] ?? 'Nessuna immagine caricata per questa categoria.'; ?></p>
-                                <?php endif; ?>
-                                <input type="file" name="immagine" id="immagine-cat-<?php echo $cat['id']; ?>" class="input-file-nascosto"
-                                       accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
-                                       onchange="aggiornaNomeFile(this, 'nome-file-img-cat-<?php echo $cat['id']; ?>')">
-                                <div class="upload-immagine">
-                                    <label for="immagine-cat-<?php echo $cat['id']; ?>" class="upload-btn" title="<?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?>">
-                                        <span class="upload-icon">📤</span>
-                                        <span><?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?></span>
-                                    </label>
-                                    <span class="upload-nome-file" id="nome-file-img-cat-<?php echo $cat['id']; ?>"></span>
-                                </div>
-                                <small style="opacity:.7;"><?php echo $t['immagine_vincoli'] ?? 'Formati JPG, PNG o WEBP — peso massimo 2MB'; ?></small>
-                            </div>
-
-                            <button type="submit"><?php echo $t['salva_immagine'] ?? 'Salva'; ?></button>
-                        </form>
-                    </div>
-
+                <td colspan="5" class="trad-cell-wrapper">
                     <div class="form-modifica" id="trad-cat-<?php echo $cat['id']; ?>" style="margin:0;">
                         <div class="trad-content">
                         <?php
@@ -753,6 +738,10 @@ $etichette_lingue = [
                                     <label><?php echo $etichette_lingue[$lng]['nome']; ?> (<?php echo strtoupper($lng); ?>)</label>
                                     <input type="text" name="nome_trad" value="<?php echo htmlspecialchars($traduzioni_cat[$lng]['nome'] ?? ''); ?>">
                                 </div>
+                                <div class="form-group">
+                                    <label><?php echo $etichette_lingue[$lng]['descrizione']; ?> (<?php echo strtoupper($lng); ?>)</label>
+                                    <textarea name="descrizione_trad" rows="2"><?php echo htmlspecialchars($traduzioni_cat[$lng]['descrizione'] ?? ''); ?></textarea>
+                                </div>
                                 <button type="submit">Salva traduzione</button>
                             </form>
                         <?php endforeach; ?>
@@ -762,7 +751,7 @@ $etichette_lingue = [
             </tr>
             <?php endforeach; ?>
             <?php if ($totale_cat === 0): ?>
-                <tr><td colspan="6" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
+                <tr><td colspan="5" style="text-align:center;"><?php echo $t['nessuna_categoria']; ?></td></tr>
             <?php endif; ?>
         </tbody>
     </table>
@@ -772,18 +761,128 @@ $etichette_lingue = [
     <h2><?php echo $t['impostazioni_menu'] ?? 'Impostazioni menu'; ?></h2>
     <form action="admin_v2.php" method="POST" class="form-impostazioni">
         <input type="hidden" name="azione" value="salva_impostazioni">
+
         <label class="switch-label">
+            <input type="checkbox" name="layout_accordion_categorie" value="1"
+                   <?php echo ($impostazioni['layout_accordion_categorie'] == 1) ? 'checked' : ''; ?>
+                   onchange="this.form.submit()">
+            <span>
+                <strong><?php echo $t['layout_accordion_titolo'] ?? 'Raggruppa i piatti in card per categoria'; ?></strong><br>
+                <small style="font-weight:normal; opacity:.75;">
+                    <?php echo $t['layout_accordion_descrizione'] ?? 'Ogni categoria diventa una card apribile: si clicca per espandere e vedere i piatti al suo interno.'; ?>
+                </small>
+            </span>
+        </label>
+
+        <label class="switch-label" style="margin-top:10px;">
             <input type="checkbox" name="layout_card_piatti" value="1"
                    <?php echo ($impostazioni['layout_card_piatti'] == 1) ? 'checked' : ''; ?>
                    onchange="this.form.submit()">
             <span>
                 <strong><?php echo $t['layout_card_titolo'] ?? 'Mostra i piatti come card'; ?></strong><br>
                 <small style="font-weight:normal; opacity:.75;">
-                    <?php echo $t['layout_card_descrizione'] ?? 'Vale per tutto il menu pubblico. Le immagini dei piatti restano quelle già caricate; per ogni categoria puoi caricare anche un\'immagine di copertina con l\'icona 🖼️ qui sopra.'; ?>
+                    <?php echo $t['layout_card_descrizione'] ?? 'Vale per tutto il menu pubblico (dentro ogni categoria, sia in modalità lista che accordion). Le immagini dei piatti restano quelle già caricate.'; ?>
                 </small>
             </span>
         </label>
     </form>
+
+    <hr>
+
+    <!-- ===== IMMAGINI E DESCRIZIONI CATEGORIE (facoltativo) ===== -->
+    <h2><?php echo $t['contenuti_categorie'] ?? 'Immagini e descrizioni categorie'; ?></h2>
+    <p style="font-size:13px; opacity:.7; margin-top:-10px;">
+        <?php echo $t['contenuti_categorie_info'] ?? 'Facoltativo: aggiungi un\'immagine e una breve descrizione per ogni categoria. Se le aggiungi vengono mostrate nel menu pubblico, altrimenti la categoria resta solo con il nome.'; ?>
+    </p>
+
+    <div class="piatti-lista">
+        <?php foreach ($tutte_categorie as $cat):
+            $desc_cat_attuale = $cat['descrizione'] ?? '';
+            $anteprima_desc_cat = mb_strlen($desc_cat_attuale) > 90 ? mb_substr($desc_cat_attuale, 0, 90) . '…' : $desc_cat_attuale;
+        ?>
+        <div class="piatto-card">
+            <div class="piatto-row">
+                <div class="piatto-info">
+                    <div class="nome"><?php echo htmlspecialchars($cat['nome']); ?></div>
+                    <?php if (!empty($anteprima_desc_cat)): ?>
+                        <div class="descrizione"><?php echo htmlspecialchars($anteprima_desc_cat); ?></div>
+                    <?php endif; ?>
+                </div>
+                <div class="piatto-right">
+                    <?php if (!empty($cat['immagine'])): ?>
+                        <div class="piatto-thumb">
+                            <img src="img/categorie/<?php echo htmlspecialchars($cat['immagine']); ?>" alt="<?php echo htmlspecialchars($cat['nome']); ?>">
+                        </div>
+                    <?php endif; ?>
+                    <div class="piatto-azioni">
+                        <a href="#" class="btn-immagine-icon" title="<?php echo $t['title_immagine'] ?? 'Immagine'; ?>"
+                           onclick="document.getElementById('img-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">🖼️</a>
+                        <a href="#" class="btn-modifica-icon" title="<?php echo $t['title_descrizione'] ?? 'Descrizione'; ?>"
+                           onclick="document.getElementById('desc-cat-<?php echo $cat['id']; ?>').classList.toggle('aperto'); return false;">✏️</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pannello immagine categoria -->
+            <div class="form-modifica" id="img-cat-<?php echo $cat['id']; ?>">
+                <form action="admin_v2.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="azione_cat" value="gestisci_immagine">
+                    <input type="hidden" name="id_categoria" value="<?php echo $cat['id']; ?>">
+
+                    <div class="form-group">
+                        <label><?php echo $t['immagine_categoria'] ?? 'Immagine categoria'; ?></label>
+                        <?php if (!empty($cat['immagine'])): ?>
+                            <div class="anteprima-immagine-attuale">
+                                <img src="img/categorie/<?php echo htmlspecialchars($cat['immagine']); ?>" alt="">
+                                <label style="display:flex; align-items:center; gap:8px; font-weight:normal; margin-top:6px;">
+                                    <input type="checkbox" name="rimuovi_immagine" value="1" style="width:auto;">
+                                    <?php echo $t['rimuovi_immagine'] ?? 'Rimuovi immagine'; ?>
+                                </label>
+                            </div>
+                        <?php else: ?>
+                            <p style="font-size:13px; opacity:.7; margin:0 0 10px;"><?php echo $t['immagine_assente_categoria'] ?? 'Nessuna immagine caricata per questa categoria.'; ?></p>
+                        <?php endif; ?>
+                        <input type="file" name="immagine" id="immagine-cat-<?php echo $cat['id']; ?>" class="input-file-nascosto"
+                               accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                               onchange="aggiornaNomeFile(this, 'nome-file-img-cat-<?php echo $cat['id']; ?>')">
+                        <div class="upload-immagine">
+                            <label for="immagine-cat-<?php echo $cat['id']; ?>" class="upload-btn" title="<?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?>">
+                                <span class="upload-icon">📤</span>
+                                <span><?php echo $t['carica_immagine'] ?? 'Carica immagine'; ?></span>
+                            </label>
+                            <span class="upload-nome-file" id="nome-file-img-cat-<?php echo $cat['id']; ?>"></span>
+                        </div>
+                        <small style="opacity:.7;"><?php echo $t['immagine_vincoli'] ?? 'Formati JPG, PNG o WEBP — peso massimo 2MB'; ?></small>
+                    </div>
+
+                    <button type="submit"><?php echo $t['salva_immagine'] ?? 'Salva'; ?></button>
+                </form>
+            </div>
+
+            <!-- Pannello descrizione categoria -->
+            <div class="form-modifica" id="desc-cat-<?php echo $cat['id']; ?>">
+                <form action="admin_v2.php" method="POST">
+                    <input type="hidden" name="azione_cat" value="modifica_descrizione">
+                    <input type="hidden" name="id_categoria" value="<?php echo $cat['id']; ?>">
+
+                    <div class="form-group">
+                        <label><?php echo $t['descrizione_categoria'] ?? 'Descrizione categoria'; ?></label>
+                        <textarea name="descrizione_categoria" rows="2"><?php echo htmlspecialchars($desc_cat_attuale); ?></textarea>
+                    </div>
+                    <div class="form-group" style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" name="traduci_descrizione" value="1" style="width:auto;"
+                               <?php echo !empty(get_traduzione($conn, 'categorie', $cat['id'], 'descrizione', 'en')) ? 'checked' : ''; ?>>
+                        <label style="margin:0;"><?php echo $t['traduci_descrizione'] ?? 'Traduci automaticamente'; ?></label>
+                    </div>
+                    <button type="submit"><?php echo $t['salva_descrizione'] ?? 'Salva descrizione'; ?></button>
+                </form>
+            </div>
+        </div>
+        <?php endforeach; ?>
+        <?php if ($totale_cat === 0): ?>
+            <p style="color:#888; text-align:center;"><?php echo $t['nessuna_categoria']; ?></p>
+        <?php endif; ?>
+    </div>
 
     <hr>
 

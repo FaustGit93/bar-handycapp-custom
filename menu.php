@@ -30,10 +30,11 @@ if (isset($_COOKIE['lingua_menu'])) {
 // Carichiamo il dizionario della lingua corrente (serve per gli allergeni)
 include "lang/$lang.php";
 
-// Impostazione globale: layout a card per i piatti (0 = lista, 1 = card)
+// Impostazioni globali: layout piatti (lista/card) e layout categorie (piatto/accordion)
 $res_impostazioni_menu = $conn->query("SELECT * FROM impostazioni WHERE id = 1");
 $impostazioni_menu = $res_impostazioni_menu ? $res_impostazioni_menu->fetch_assoc() : null;
 $layout_card_piatti = $impostazioni_menu['layout_card_piatti'] ?? 0;
+$layout_accordion_categorie = $impostazioni_menu['layout_accordion_categorie'] ?? 0;
 
 $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDER BY ordine ASC");
 ?>
@@ -87,16 +88,46 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 
             if ($piatti_query->num_rows > 0) {
                 $nome_cat = get_traduzione($conn, 'categorie', $categoria_id, 'nome', $lang) ?? $cat['nome'];
+                $desc_cat = get_traduzione($conn, 'categorie', $categoria_id, 'descrizione', $lang) ?? ($cat['descrizione'] ?? '');
 
                 echo "<section class='category-section' id='cat-" . $categoria_id . "'>";
 
-                // Banner immagine categoria (facoltativo, indipendente dal layout piatti scelto)
-                if (!empty($cat['immagine'])) {
-                    $percorso_banner = "img/categorie/" . htmlspecialchars($cat['immagine']);
-                    echo "<div class='category-banner'><img src='" . $percorso_banner . "' alt='" . htmlspecialchars($nome_cat) . "'></div>";
-                }
+                if ($layout_accordion_categorie) {
+                    // ===== INTESTAZIONE CATEGORIA: CARD CLICCABILE AD ACCORDION =====
+                    echo "<div class='category-card' data-cat-toggle='$categoria_id'>";
 
-                echo "<h2 class='category-title'>" . htmlspecialchars($nome_cat) . "</h2>";
+                    if (!empty($cat['immagine'])) {
+                        $percorso_thumb_cat = "img/categorie/" . htmlspecialchars($cat['immagine']);
+                        echo "  <div class='category-card-media'><img src='" . $percorso_thumb_cat . "' alt='" . htmlspecialchars($nome_cat) . "'></div>";
+                    } else {
+                        echo "  <div class='category-card-media placeholder'>🍽️</div>";
+                    }
+
+                    echo "  <div class='category-card-info'>";
+                    echo "    <div class='category-card-name'>" . htmlspecialchars($nome_cat) . "</div>";
+                    if (!empty($desc_cat)) {
+                        echo "    <div class='category-card-desc'>" . htmlspecialchars($desc_cat) . "</div>";
+                    }
+                    echo "  </div>";
+                    echo "  <span class='category-card-chevron'>▾</span>";
+                    echo "</div>"; // .category-card
+
+                    echo "<div class='category-body' id='cat-body-" . $categoria_id . "'>";
+                    echo "<div class='category-body-inner'>";
+
+                } else {
+                    // ===== INTESTAZIONE CATEGORIA: TITOLO PIATTO (comportamento originale) =====
+                    if (!empty($cat['immagine'])) {
+                        $percorso_banner = "img/categorie/" . htmlspecialchars($cat['immagine']);
+                        echo "<div class='category-banner'><img src='" . $percorso_banner . "' alt='" . htmlspecialchars($nome_cat) . "'></div>";
+                    }
+
+                    echo "<h2 class='category-title'>" . htmlspecialchars($nome_cat) . "</h2>";
+
+                    if (!empty($desc_cat)) {
+                        echo "<p class='category-description'>" . htmlspecialchars($desc_cat) . "</p>";
+                    }
+                }
 
                 if ($layout_card_piatti) {
                     echo "<div class='piatti-grid-card'>";
@@ -202,6 +233,11 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 
                 if ($layout_card_piatti) {
                     echo "</div>"; // .piatti-grid-card
+                }
+
+                if ($layout_accordion_categorie) {
+                    echo "</div>"; // .category-body-inner
+                    echo "</div>"; // .category-body
                 }
 
                 echo "</section>";
@@ -313,6 +349,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 <script src="js/categoryclick.js"></script>
 <script src="js/menuallergeni.js"></script>
 <script src="js/menuimmagine.js"></script>
+<script src="js/menuaccordion.js"></script>
 <script src="js/menu.js"></script>
 
 
