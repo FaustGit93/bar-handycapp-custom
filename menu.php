@@ -94,13 +94,13 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 
                 if ($layout_accordion_categorie) {
                     // ===== INTESTAZIONE CATEGORIA: CARD CLICCABILE AD ACCORDION =====
-                    echo "<div class='category-card' data-cat-toggle='$categoria_id'>";
+                    $ha_media_cat = !empty($cat['immagine']);
+                    $classe_card_cat = $ha_media_cat ? 'category-card has-media' : 'category-card no-media';
+                    echo "<div class='$classe_card_cat' data-cat-toggle='$categoria_id'>";
 
-                    if (!empty($cat['immagine'])) {
+                    if ($ha_media_cat) {
                         $percorso_thumb_cat = "img/categorie/" . htmlspecialchars($cat['immagine']);
                         echo "  <div class='category-card-media'><img src='" . $percorso_thumb_cat . "' alt='" . htmlspecialchars($nome_cat) . "'></div>";
-                    } else {
-                        echo "  <div class='category-card-media placeholder'>🍽️</div>";
                     }
 
                     echo "  <div class='category-card-info'>";
