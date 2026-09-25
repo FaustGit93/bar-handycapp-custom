@@ -522,6 +522,7 @@ table .btn-traduzioni-icon {
 }
 
 .side-panel-body {
+    scrollbar-gutter: stable;
     padding: 20px;
     overflow-y: auto;
     flex: 1;
@@ -532,6 +533,10 @@ table .btn-traduzioni-icon {
 body.panel-aperto-blocca-scroll {
     overflow: hidden;
 }
+
+
+
+
 
 #toast-container {
     position: fixed;
@@ -568,4 +573,37 @@ body.panel-aperto-blocca-scroll {
 
 .toast-error {
     background: #dc3545;
+}
+
+
+/* Tendina impostazioni (riutilizzabile per future sezioni) */
+.settings-accordion {
+    margin-top: 10px;
+}
+.settings-accordion-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: inherit;
+    text-align: left;
+}
+.settings-accordion-arrow {
+    transition: transform 0.2s ease;
+    font-size: 0.85em;
+}
+.settings-accordion.aperto .settings-accordion-arrow {
+    transform: rotate(180deg);
+}
+.settings-accordion-body {
+    display: none;
+}
+.settings-accordion.aperto .settings-accordion-body {
+    display: block;
 }

@@ -8,6 +8,7 @@ test_hash.php
 config_on.php
 roadmap.md
 Sql1944693_1.sql
+export_menu_pdf.bat
 # --- FILE DI SISTEMA & IDE ---
 # File generati dal sistema operativo (es. Mac o Windows)
 .DS_Store

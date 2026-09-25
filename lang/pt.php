@@ -14,7 +14,7 @@ $t = [
 
     // Admin - generale
     'pannello_admin'            => 'Painel Admin',
-    'esci'                      => 'Sair (Logout)',
+    'esci'                      => 'Sair',
 
     // Admin - categorie
     'gestione_categorie'        => '📂 Gestão de Categorias',
@@ -111,6 +111,58 @@ $t = [
 'footer_piva' => 'NIF:',
 
 //Footer Location
-'footer_location' => 'Itália'
+'footer_location' => 'Itália',
+
+// Admin - upload de imagens (erros)
+'img_errore_upload'         => 'Falha no carregamento da imagem.',
+'img_errore_peso'           => 'Imagem muito grande: o limite é 2MB.',
+'img_errore_formato'        => 'Formato inválido: são permitidos apenas JPG, PNG ou WEBP.',
+'img_errore_salvataggio'    => 'Não foi possível salvar a imagem no servidor.',
+'img_errore_generico'       => 'Erro ao processar a imagem.',
+
+// Admin - mensagens de imagem/descrição/tradução
+'immagine_salvata'          => 'Imagem atualizada!',
+'immagine_rimossa'          => 'Imagem removida!',
+'immagine_nessuna_azione'   => 'Selecione um arquivo ou marque a opção de remoção.',
+'descrizione_salvata'       => 'Descrição salva!',
+'descrizione_errore'        => 'Erro ao salvar a descrição.',
+'traduzione_salvata'        => 'Tradução salva!',
+
+// Admin - painel de configurações
+'impostazioni_menu'             => 'Configurações do menu',
+'layout_accordion_titolo'       => 'Agrupar itens em cartões por categoria',
+'layout_accordion_descrizione'  => 'Cada categoria se torna um cartão expansível: clique para abrir e ver os itens dentro dela.',
+'layout_card_titolo'            => 'Mostrar itens como cartões',
+'layout_card_descrizione'       => 'Aplica-se a todo o menu público (dentro de cada categoria, tanto no modo lista quanto no modo acordeão). As imagens dos itens permanecem as já carregadas.',
+
+// Admin - imagens e descrições das categorias
+'contenuti_categorie'           => 'Imagens e descrições das categorias',
+'contenuti_categorie_info'      => 'Opcional: adicione uma imagem e uma breve descrição para cada categoria. Se adicionadas, serão exibidas no menu público; caso contrário, a categoria permanece apenas com o nome.',
+'title_immagine'                => 'Imagem',
+'title_descrizione'             => 'Descrição',
+'immagine_categoria'            => 'Imagem da categoria',
+'rimuovi_immagine'              => 'Remover imagem',
+'immagine_assente_categoria'    => 'Nenhuma imagem carregada para esta categoria.',
+'carica_immagine'               => 'Carregar imagem',
+'immagine_vincoli'              => 'Formatos JPG, PNG ou WEBP — tamanho máximo 2MB',
+'salva_immagine'                => 'Salvar',
+'descrizione_categoria'         => 'Descrição da categoria',
+'traduci_descrizione'           => 'Traduzir automaticamente',
+'salva_descrizione'             => 'Salvar descrição',
+
+// Admin - imagem do item
+'immagine_piatto'               => 'Imagem do item',
+'immagine_piatto_opzionale'     => 'Imagem do item (opcional)',
+'immagine_assente'              => 'Nenhuma imagem carregada para este item.',
+
+// Admin - barra inferior (dock)
+'nav_categorie'                 => 'Categorias',
+'nav_nuovo_piatto'              => 'Novo item',
+'nav_impostazioni'              => 'Configurações',
+'confirm_logout'                => 'Tem certeza de que deseja sair?',
+
+// Admin - traduções manuais
+'traduzioni_titolo'             => 'Traduções',
+'salva_traduzione_btn'          => 'Salvar tradução'
 
 ];

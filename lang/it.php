@@ -14,7 +14,7 @@ $t = [
 
     // Admin - generale
     'pannello_admin'            => 'Pannello Admin',
-    'esci'                      => 'Esci (Logout)',
+    'esci'                      => 'Esci',
 
     // Admin - categorie
     'gestione_categorie'        => '📂 Gestione Categorie',
@@ -112,6 +112,58 @@ $t = [
 
 
 //Footer Location
-'footer_location' => 'Italia'
+'footer_location' => 'Italia',
+
+// Admin - upload immagini (errori)
+'img_errore_upload'         => 'Caricamento immagine non riuscito.',
+'img_errore_peso'           => 'Immagine troppo grande: il limite è 2MB.',
+'img_errore_formato'        => 'Formato non valido: sono ammessi JPG, PNG o WEBP.',
+'img_errore_salvataggio'    => 'Impossibile salvare l\'immagine sul server.',
+'img_errore_generico'       => 'Errore durante la gestione dell\'immagine.',
+
+// Admin - messaggi immagini/descrizioni/traduzioni
+'immagine_salvata'          => 'Immagine aggiornata!',
+'immagine_rimossa'          => 'Immagine rimossa!',
+'immagine_nessuna_azione'   => 'Seleziona un file oppure spunta la rimozione.',
+'descrizione_salvata'       => 'Descrizione salvata!',
+'descrizione_errore'        => 'Errore nel salvataggio della descrizione.',
+'traduzione_salvata'        => 'Traduzione salvata!',
+
+// Admin - pannello impostazioni
+'impostazioni_menu'             => 'Impostazioni menu',
+'layout_accordion_titolo'       => 'Raggruppa i piatti in card per categoria',
+'layout_accordion_descrizione'  => 'Ogni categoria diventa una card apribile: si clicca per espandere e vedere i piatti al suo interno.',
+'layout_card_titolo'            => 'Mostra i piatti come card',
+'layout_card_descrizione'       => 'Vale per tutto il menu pubblico (dentro ogni categoria, sia in modalità lista che accordion). Le immagini dei piatti restano quelle già caricate.',
+
+// Admin - immagini e descrizioni categorie
+'contenuti_categorie'           => 'Immagini e descrizioni categorie',
+'contenuti_categorie_info'      => 'Facoltativo: aggiungi un\'immagine e una breve descrizione per ogni categoria. Se le aggiungi vengono mostrate nel menu pubblico, altrimenti la categoria resta solo con il nome.',
+'title_immagine'                => 'Immagine',
+'title_descrizione'             => 'Descrizione',
+'immagine_categoria'            => 'Immagine categoria',
+'rimuovi_immagine'              => 'Rimuovi immagine',
+'immagine_assente_categoria'    => 'Nessuna immagine caricata per questa categoria.',
+'carica_immagine'               => 'Carica immagine',
+'immagine_vincoli'              => 'Formati JPG, PNG o WEBP — peso massimo 2MB',
+'salva_immagine'                => 'Salva',
+'descrizione_categoria'         => 'Descrizione categoria',
+'traduci_descrizione'           => 'Traduci automaticamente',
+'salva_descrizione'             => 'Salva descrizione',
+
+// Admin - immagine piatto
+'immagine_piatto'               => 'Immagine del piatto',
+'immagine_piatto_opzionale'     => 'Immagine del piatto (opzionale)',
+'immagine_assente'              => 'Nessuna immagine caricata per questo piatto.',
+
+// Admin - barra in basso (dock)
+'nav_categorie'                 => 'Categorie',
+'nav_nuovo_piatto'              => 'Nuovo piatto',
+'nav_impostazioni'              => 'Impostazioni',
+'confirm_logout'                => 'Vuoi davvero uscire?',
+
+// Admin - traduzioni manuali
+'traduzioni_titolo'             => 'Traduzioni',
+'salva_traduzione_btn'          => 'Salva traduzione'
 
 ];

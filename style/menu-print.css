@@ -1,0 +1,126 @@
+/* ============================================================
+   MENU-PRINT.CSS
+   Si attiva SOLO in stampa / esportazione PDF (media="print" nel
+   tag <link> in menu.php). Non influisce mai sulla navigazione
+   normale del sito.
+   ============================================================ */
+
+/* --- Unico punto di controllo per il "respiro" di pagina: usato sia
+       per il margine fisico del foglio (@page) sia per lo spazio
+       sopra le categorie che iniziano una nuova pagina. Cambia questo
+       valore solo qui: si propaga ovunque, niente numeri sparsi. --- */
+:root {
+    --print-page-gutter: 15mm;
+}
+
+@page {
+    size: A4;
+    margin: var(--print-page-gutter) 12mm;
+}
+
+/* --- Forza la stampa di sfondi e colori: molti browser li rimuovono
+       di default in stampa per risparmiare inchiostro, facendo
+       sembrare che il tema (chiaro/scuro) non venga applicato --- */
+html, body {
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
+}
+
+/* --- Nessuna palette forzata: il PDF eredita semplicemente i colori
+       (chiaro o scuro) che la pagina ha nel momento dell'esportazione,
+       tramite l'attributo data-theme già gestito da menutheme.js --- */
+
+/* --- Elementi solo interattivi: inutili (o fuorvianti) su carta --- */
+.lang-fab,
+.theme-fab,
+.img-lightbox,
+.category-card-chevron,
+.icona-allergeni,
+.footer-social {
+    display: none !important;
+}
+
+/* --- Il logo resta (è un locale, il brand conta), ma togliamo lo
+       sticky positioning e la nav a pillole delle categorie, inutile
+       su carta dato che le categorie sono già tutte visibili aperte --- */
+.sticky-header {
+    position: static !important;
+    box-shadow: none !important;
+}
+
+.sticky-nav {
+    display: none !important;
+}
+
+.menu-logo {
+    padding: 0 0 10px 0;
+    border-bottom: none !important;
+}
+
+.menu-logo img {
+    max-height: 65px;
+}
+
+/* --- Forza TUTTI gli accordion categoria aperti, a prescindere
+       dallo stato JS (classe "aperto" assente al primo caricamento) --- */
+.category-body {
+    grid-template-rows: 1fr !important;
+    margin-top: 14px !important;
+    overflow: visible !important;
+}
+
+.category-card {
+    cursor: default !important;
+}
+
+/* --- Forza tutti i pannelli allergeni aperti (il badge cliccabile
+       è già nascosto sopra, qui mostriamo direttamente il contenuto) --- */
+.dettaglio-allergeni {
+    max-height: none !important;
+    overflow: visible !important;
+    margin-top: 6px !important;
+}
+
+/* --- Interruzioni di pagina: evita che una categoria o un piatto
+       vengano tagliati a metà tra due pagine A4 --- */
+.category-section,
+.category-card,
+.menu-item,
+.menu-item-card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+/* --- Mini-logo ripetuto prima di ogni categoria (tranne la prima,
+       che ha già l'header sopra). Crea uno spazio reale e affidabile
+       - non un margine/padding simulato che Chrome può collassare ai
+       punti di interruzione pagina - e dà a ogni pagina la stessa
+       identità visiva della prima. --- */
+.print-category-header {
+    display: block;
+    text-align: center;
+    padding-top: 4mm;
+    padding-bottom: 8mm;
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
+.print-category-header img {
+    max-height: 45px;
+    width: auto;
+}
+
+/* --- Immagini: limitiamo l'altezza per non sprecare troppo spazio
+       pagina quando una categoria ha un banner/copertina --- */
+.category-card-media img,
+.category-banner img {
+    max-height: 150px;
+}
+
+/* --- Footer: rimuoviamo il padding pensato per lasciare spazio ai
+       FAB mobile, non serve più su carta --- */
+.menu-footer {
+    padding: 20px 0 20px;
+    margin-top: 20px;
+    border-top: 1px solid var(--border-item);
+}

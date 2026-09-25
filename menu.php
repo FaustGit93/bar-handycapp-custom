@@ -60,6 +60,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Menu - FYR</title>
     <link rel="stylesheet" href="style/menu.css">
+    <link rel="stylesheet" href="style/menu-print.css" media="print">
         <script src="https://kit.fontawesome.com/42a675b1a0.js" crossorigin="anonymous"></script>
 
 </head>
@@ -351,7 +352,7 @@ $categorie_query = $conn->query("SELECT * FROM categorie WHERE visibile = 1 ORDE
 <script src="js/menuimmagine.js"></script>
 <script src="js/menuaccordion.js"></script>
 <script src="js/menu.js"></script>
-
+<script src="js/menuprint.js"></script>
 
 
 </body>

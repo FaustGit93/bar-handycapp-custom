@@ -110,6 +110,58 @@ $t = [
 'footer_piva' => 'VAT Number:',
 
 //Footer Location
-'footer_location' => 'Italy'
+'footer_location' => 'Italy',
+
+// Admin - image upload (errors)
+'img_errore_upload'         => 'Image upload failed.',
+'img_errore_peso'           => 'Image too large: the limit is 2MB.',
+'img_errore_formato'        => 'Invalid format: only JPG, PNG or WEBP are allowed.',
+'img_errore_salvataggio'    => 'Unable to save the image on the server.',
+'img_errore_generico'       => 'Error while handling the image.',
+
+// Admin - image/description/translation messages
+'immagine_salvata'          => 'Image updated!',
+'immagine_rimossa'          => 'Image removed!',
+'immagine_nessuna_azione'   => 'Select a file or check the removal option.',
+'descrizione_salvata'       => 'Description saved!',
+'descrizione_errore'        => 'Error saving the description.',
+'traduzione_salvata'        => 'Translation saved!',
+
+// Admin - settings panel
+'impostazioni_menu'             => 'Menu settings',
+'layout_accordion_titolo'       => 'Group items into cards by category',
+'layout_accordion_descrizione'  => 'Each category becomes an expandable card: click to open it and see the items inside.',
+'layout_card_titolo'            => 'Show items as cards',
+'layout_card_descrizione'       => 'Applies to the whole public menu (inside every category, in both list and accordion mode). Item images remain the ones already uploaded.',
+
+// Admin - category images and descriptions
+'contenuti_categorie'           => 'Category images and descriptions',
+'contenuti_categorie_info'      => 'Optional: add an image and a short description for each category. If added, they are shown in the public menu; otherwise the category stays with just its name.',
+'title_immagine'                => 'Image',
+'title_descrizione'             => 'Description',
+'immagine_categoria'            => 'Category image',
+'rimuovi_immagine'              => 'Remove image',
+'immagine_assente_categoria'    => 'No image uploaded for this category.',
+'carica_immagine'               => 'Upload image',
+'immagine_vincoli'              => 'JPG, PNG or WEBP formats — max size 2MB',
+'salva_immagine'                => 'Save',
+'descrizione_categoria'         => 'Category description',
+'traduci_descrizione'           => 'Translate automatically',
+'salva_descrizione'             => 'Save description',
+
+// Admin - item image
+'immagine_piatto'               => 'Item image',
+'immagine_piatto_opzionale'     => 'Item image (optional)',
+'immagine_assente'              => 'No image uploaded for this item.',
+
+// Admin - bottom bar (dock)
+'nav_categorie'                 => 'Categories',
+'nav_nuovo_piatto'              => 'New item',
+'nav_impostazioni'              => 'Settings',
+'confirm_logout'                => 'Are you sure you want to log out?',
+
+// Admin - manual translations
+'traduzioni_titolo'             => 'Translations',
+'salva_traduzione_btn'          => 'Save translation'
 
 ];
