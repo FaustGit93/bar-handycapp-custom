@@ -9,6 +9,8 @@
     --th-bg: #f8f9fa;
     --card-bg: #fff;
     --label-color: #333;
+        --bottom-nav-height: 62px;
+
 }
 
 html[data-theme="dark"] {
@@ -462,7 +464,10 @@ table .btn-traduzioni-icon {
 /* ===== Side panel Impostazioni ===== */
 .side-panel-backdrop {
     position: fixed;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
     background: rgba(0,0,0,0.45);
     z-index: 600;
     opacity: 0;
@@ -479,7 +484,7 @@ table .btn-traduzioni-icon {
     position: fixed;
     top: 0;
     right: 0;
-    bottom: 0;
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
     width: min(440px, 92vw);
     background: var(--bg-container);
     z-index: 601;
@@ -582,6 +587,7 @@ body.panel-aperto-blocca-scroll {
 }
 .settings-accordion-header {
     -webkit-tap-highlight-color: transparent;
+    outline: none;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -594,15 +600,6 @@ body.panel-aperto-blocca-scroll {
     font-weight: 600;
     color: inherit;
     text-align: left;
-}
-
-.settings-accordion-header:focus {
-    outline: none;
-}
-
-.settings-accordion-header:focus-visible {
-    outline: 2px solid #007bff;
-    outline-offset: 2px;
 }
 
 .settings-accordion-arrow {
