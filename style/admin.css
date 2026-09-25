@@ -581,6 +581,7 @@ body.panel-aperto-blocca-scroll {
     margin-top: 10px;
 }
 .settings-accordion-header {
+    -webkit-tap-highlight-color: transparent;
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -594,6 +595,16 @@ body.panel-aperto-blocca-scroll {
     color: inherit;
     text-align: left;
 }
+
+.settings-accordion-header:focus {
+    outline: none;
+}
+
+.settings-accordion-header:focus-visible {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
 .settings-accordion-arrow {
     transition: transform 0.2s ease;
     font-size: 0.85em;
