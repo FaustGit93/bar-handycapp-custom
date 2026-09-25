@@ -767,44 +767,58 @@ $etichette_lingue = [
             <form action="admin_v2.php" method="POST" class="form-impostazioni">
                 <input type="hidden" name="azione" value="salva_impostazioni">
 
-                <label class="switch-label">
-                    <input type="checkbox" name="layout_accordion_categorie" value="1"
-                           <?php echo ($impostazioni['layout_accordion_categorie'] == 1) ? 'checked' : ''; ?>
-                           onchange="this.form.submit()">
-                    <span>
-                        <strong><?php echo $t['layout_accordion_titolo']; ?></strong><br>
-                        <small style="font-weight:normal; opacity:.75;">
-                            <?php echo $t['layout_accordion_descrizione']; ?>
-                        </small>
-                    </span>
-                </label>
+                <div class="settings-accordion" id="accordion-layout-categorie">
+                    <button type="button" class="settings-accordion-header" onclick="toggleAccordion('accordion-layout-categorie')">
+                        <span class="settings-accordion-title"><?php echo $t['layout_accordion_titolo']; ?></span>
+                        <span class="settings-accordion-arrow">▾</span>
+                    </button>
+                    <div class="settings-accordion-body">
+                        <label class="switch-label">
+                            <input type="checkbox" name="layout_accordion_categorie" value="1"
+                                   <?php echo ($impostazioni['layout_accordion_categorie'] == 1) ? 'checked' : ''; ?>
+                                   onchange="this.form.submit()">
+                            <span>
+                                <small style="font-weight:normal; opacity:.75;">
+                                    <?php echo $t['layout_accordion_descrizione']; ?>
+                                </small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
 
-                <label class="switch-label" style="margin-top:10px;">
-                    <input type="checkbox" name="layout_card_piatti" value="1"
-                           <?php echo ($impostazioni['layout_card_piatti'] == 1) ? 'checked' : ''; ?>
-                           onchange="this.form.submit()">
-                    <span>
-                        <strong><?php echo $t['layout_card_titolo']; ?></strong><br>
-                        <small style="font-weight:normal; opacity:.75;">
-                            <?php echo $t['layout_card_descrizione']; ?>
-                        </small>
-                    </span>
-                </label>
+                <div class="settings-accordion" id="accordion-layout-piatti" style="margin-top:10px;">
+                    <button type="button" class="settings-accordion-header" onclick="toggleAccordion('accordion-layout-piatti')">
+                        <span class="settings-accordion-title"><?php echo $t['layout_card_titolo']; ?></span>
+                        <span class="settings-accordion-arrow">▾</span>
+                    </button>
+                    <div class="settings-accordion-body">
+                        <label class="switch-label">
+                            <input type="checkbox" name="layout_card_piatti" value="1"
+                                   <?php echo ($impostazioni['layout_card_piatti'] == 1) ? 'checked' : ''; ?>
+                                   onchange="this.form.submit()">
+                            <span>
+                                <small style="font-weight:normal; opacity:.75;">
+                                    <?php echo $t['layout_card_descrizione']; ?>
+                                </small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
             </form>
 
             <hr>
 
             <!-- ===== IMMAGINI E DESCRIZIONI CATEGORIE (facoltativo, in tendina) ===== -->
             <div class="settings-accordion" id="accordion-contenuti-categorie">
+                <h2 style="margin-bottom:4px;"><?php echo $t['contenuti_categorie']; ?></h2>
+                <p style="font-size:13px; opacity:.7; margin-top:0;">
+                    <?php echo $t['contenuti_categorie_info']; ?>
+                </p>
                 <button type="button" class="settings-accordion-header" onclick="toggleAccordion('accordion-contenuti-categorie')">
-                    <span class="settings-accordion-title"><?php echo $t['contenuti_categorie']; ?></span>
+                    <span class="settings-accordion-title"><?php echo $t['nav_categorie']; ?></span>
                     <span class="settings-accordion-arrow">▾</span>
                 </button>
                 <div class="settings-accordion-body">
-                    <p style="font-size:13px; opacity:.7; margin-top:0;">
-                        <?php echo $t['contenuti_categorie_info']; ?>
-                    </p>
-
                     <div class="piatti-lista">
                         <?php foreach ($tutte_categorie as $cat):
                             $desc_cat_attuale = $cat['descrizione'] ?? '';
@@ -913,7 +927,7 @@ $etichette_lingue = [
             <select name="categoria_id" id="categoria_id" required>
                 <option value=""><?php echo $t['seleziona_categoria']; ?></option>
                 <?php while ($cat = $categorie_per_form->fetch_assoc()): ?>
-                    <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars($cat['nome']); ?></option>
+                    <option value="<?php echo $cat['id']; ?>"><?php echo htmlspecialchars(get_traduzione($conn, 'categorie', $cat['id'], 'nome', $lang) ?? $cat['nome']); ?></option>
                 <?php endwhile; ?>
             </select>
         </div>
@@ -1066,7 +1080,7 @@ $etichette_lingue = [
                             <select name="categoria_id" required>
                                 <?php foreach ($lista_categorie_edit as $cat_opt): ?>
                                     <option value="<?php echo $cat_opt['id']; ?>" <?php echo ($cat_opt['id'] == $piatto['categoria_id']) ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($cat_opt['nome']); ?>
+                                        <?php echo htmlspecialchars(get_traduzione($conn, 'categorie', $cat_opt['id'], 'nome', $lang) ?? $cat_opt['nome']); ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
